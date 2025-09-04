@@ -11,9 +11,9 @@
 	<script>
         function main() {
           /* Se prepara el lienzo y se obtiene el contexto del WebGL.                */
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
 
-          var gl = canvas.getContext("webgl2", { antialias: true });
+          let gl = canvas.getContext("webgl2", { antialias: true });
 
           if (!gl) {
              document.write("WebGL 2.0 no está disponible en tu navegador");
