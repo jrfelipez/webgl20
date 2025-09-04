@@ -37,9 +37,9 @@
       <script>
         "use strict";
 
-        var programaID;
-        var gl;
-        var triangulo;
+        let programaID;
+        let gl;
+        let triangulo;
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -47,7 +47,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -55,7 +55,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -93,7 +93,7 @@
              *  0          1  
              */
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               -1,  1, // 0
               -1, -1, // 1
                1, -1, // 2
@@ -101,7 +101,7 @@
             ];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [ 
+            let colores = [ 
                1, 0, 0, 1, // 0
                1, 0, 0, 1, // 1
                0, 1, 0, 1, // 2
@@ -109,7 +109,7 @@
             ];
 
             /* Indices */
-            var indices = [ 
+            let indices = [ 
                0, 1, 2, 3
             ];
 
@@ -121,7 +121,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -137,7 +137,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
@@ -153,7 +153,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */
-            var codigoIndices = gl.createBuffer();
+            let codigoIndices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, codigoIndices);
@@ -179,7 +179,7 @@
             gl.bindVertexArray(this.trianguloVAO);
 
             /* Se renderiza las primitivas desde los datos del arreglo */
-            var offset = 0;
+            let offset = 0;
             gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, offset * 2);
 
             /* Se desactiva el objeto del arreglo de vértices */
@@ -204,7 +204,7 @@
         function main() {
 
           /* Paso 1: Se prepara el lienzo y se obtiene el contexto del WebGL.        */
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
 
           gl = canvas.getContext("webgl2", { antialias: true });
           if (!gl) {

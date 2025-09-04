@@ -37,9 +37,9 @@
       <script>
         "use strict";
 
-        var programaID;
-        var gl;
-        var circulo;
+        let programaID;
+        let gl;
+        let circulo;
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -47,7 +47,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -55,7 +55,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -97,13 +97,13 @@
              */
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [];
+            let vertices = [];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [];
+            let colores = [];
 
             /* Lee los vértices (x,y) y colores (r,g,b,a) */
-            for (var i = 0; i < 360; i++) {
+            for (let i = 0; i < 360; i++) {
               vertices.push(radio * Math.cos(i * Math.PI / 180));
               vertices.push(radio * Math.sin(i * Math.PI / 180));
 
@@ -121,7 +121,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -137,7 +137,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
@@ -190,7 +190,7 @@
         function main() {
 
           /* Paso 1: Se prepara el lienzo y se obtiene el contexto del WebGL.        */
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
 
           gl = canvas.getContext("webgl2", { antialias: true });
           if (!gl) {
