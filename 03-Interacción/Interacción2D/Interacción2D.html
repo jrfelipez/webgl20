@@ -42,25 +42,25 @@
         'use strict';
 
         /* Variables globales */
-        var programaID;
-        var gl;
-        var rectangulos;
-        var circulo;
-        var canvas;
+        let programaID;
+        let gl;
+        let rectangulos;
+        let circulo;
+        let canvas;
 
         /* Ancho y Alto */
         const ANCHO = 500;
         const ALTO = 500;
 
         /* Variables Uniformes */
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -68,7 +68,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -76,7 +76,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -115,7 +115,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -125,7 +125,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -136,8 +136,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -148,8 +148,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -160,8 +160,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -187,8 +187,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -229,7 +229,7 @@
              */
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
                // Rectángulo 1
                -3, 0, // 0
                 0, 0, // 1
@@ -243,7 +243,7 @@
             ];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [ 
+            let colores = [ 
                // Rectángulo 1
                 1, 0, 0, 1, // 0
                 1, 0, 0, 1, // 1
@@ -257,7 +257,7 @@
             ];
 
             /* Indices */
-            var indices = [ 
+            let indices = [ 
                 0, 1, 2, 0, 2, 3, // Rectángulo 1
                 4, 5, 6, 4, 6, 7  // Rectángulo 2
             ];
@@ -270,7 +270,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -286,7 +286,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
@@ -302,7 +302,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */
-            var indiceBuffer = gl.createBuffer();
+            let indiceBuffer = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
@@ -353,13 +353,13 @@
              */
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [];
+            let vertices = [];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [];
+            let colores = [];
 
             /* Lee los vértices (x,y) y colores (r,g,b,a) */
-            for (var i = 0; i < 360; i++) {
+            for (let i = 0; i < 360; i++) {
                vertices.push(radio * Math.cos(i * Math.PI / 180));
                vertices.push(radio * Math.sin(i * Math.PI / 180));
 
@@ -377,7 +377,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -393,7 +393,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
@@ -435,12 +435,12 @@
         /***************************************************************************/
 
         function playOgg(archivo){
-          var archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
+          let archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
           document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + archivoOgg + '</audio>';
         }
 
         function playMp3(archivo){
-          var archivoMp3 = '<source src="' + archivo + '.mp3" type="audio/mpeg">';
+          let archivoMp3 = '<source src="' + archivo + '.mp3" type="audio/mpeg">';
           document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + archivoOgg + '</audio>';
         }
 
@@ -465,8 +465,8 @@
         /***************************************************************************/
 
         function mouseDown(event) {
-          var posx = new Number();
-          var posy = new Number();
+          let posx = new Number();
+          let posy = new Number();
 
           /* Obtiene la coordenada dentro del canvas */
           posx = event.x - canvas.offsetLeft;
