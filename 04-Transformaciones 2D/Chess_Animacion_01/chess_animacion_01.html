@@ -38,25 +38,20 @@
         "use strict";
 
         /* Variables globales */
-        var programaID;
-        var gl;
-        var canvas;        
-        var tablero;
-        var peon;
-        var rey;
-        var reina;
-        var alfil;
-        var caballo;
-        var torre;
+        let programaID;
+        let gl;
+        let canvas;        
+        let tablero;
+        let peon, rey, reina, alfil, caballo, torre;
 
         /* Datos del Tablero */
         const TAM_CASILLA = 2;
-        var primera_eleccion = true;
-        var fila_casilla_1, col_casilla_1; /* origen */
-        var fila_casilla_2, col_casilla_2; /* destino */
-        var pieza;
+        let primera_eleccion = true;
+        let fila_casilla_1, col_casilla_1; /* origen */
+        let fila_casilla_2, col_casilla_2; /* destino */
+        let pieza;
 
-        var tableroMat = [
+        let tableroMat = [
           ["T","C","A","R","Y","A","C","T"],
           ["P","P","P","P","P","P","P","P"],
           [" "," "," "," "," "," "," "," "],
@@ -67,30 +62,30 @@
           ["t","c","a","r","y","a","c","t"]];        
 
         /* Arreglo para los datos de la interpolación */ 
-        var posicion = [];
-        var ipos; // Indice del Arreglo de la posición
+        let posicion = [];
+        let ipos; // Indice del Arreglo de la posición
 
         /* Ancho y Alto (ventana) */
         const ANCHO = 500;
         const ALTO = 500;
 
         /* Variables Uniformes */
-        var uColor;
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uColor;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /* Variables de la Animación */
-        var animacion = false;
+        let animacion = false;
         const PERIODO_DE_LA_ANIMACION = 0.0167; // 1/60 = 0.0167 (60 cuadros por 1 seg.)
-        var tiempo_real;
-        var tiempoAnimacion = PERIODO_DE_LA_ANIMACION;
-        var inicio = Date.now(); // Tiempo Inicial
+        let tiempo_real;
+        let tiempoAnimacion = PERIODO_DE_LA_ANIMACION;
+        let inicio = Date.now(); // Tiempo Inicial
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -98,7 +93,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -106,7 +101,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -145,7 +140,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -155,7 +150,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -166,8 +161,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -178,8 +173,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -190,8 +185,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -217,8 +212,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -248,11 +243,11 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = new Float32Array(9 * 9 * 2);
+            let vertices = new Float32Array(9 * 9 * 2);
 
-            var k = 0;
-            var x;
-            var y = 0;
+            let k = 0;
+            let x;
+            let y = 0;
 
             for(let i = 0; i <= 8; i++){
               x = 0;
@@ -274,9 +269,9 @@
              *    0,3, 3,1, 1,0  0,2, 2,3, 3,0   =>  12 indices
              */
             /* Indices */
-            var indices = new Float32Array(4 * 8 * 8);
-            var k1 = 0;    // 1er indice del vertice de abajo
-            var k2 = 9;    // 1er indice del vertice de arriba
+            let indices = new Float32Array(4 * 8 * 8);
+            let k1 = 0;    // 1er indice del vertice de abajo
+            let k2 = 9;    // 1er indice del vertice de arriba
             for(let i = 0; i < 8; i++){
               for(let j = 0; j < 8; j++){
                 indices[k++] = k1;
@@ -291,25 +286,25 @@
             }
             /*
             console.log(vertices.length);
-            for (var i = 0; i < vertices.length; i+=2) {
+            for (let i = 0; i < vertices.length; i+=2) {
               console.log(i + " : " + vertices[i] + "  " + vertices[i+1])
             }
 
             console.log(indices.length);
-            for (var i = 0; i < indices.length; i+=4) {
+            for (let i = 0; i < indices.length; i+=4) {
               console.log(i + " : " + indices[i] + "  " + indices[i+1] + "  " + indices[i+2] + "  " + indices[i+3])
             }
             */
             this.tableroVAO = gl.createVertexArray();
             gl.bindVertexArray(this.tableroVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-            var indiceBuffer = gl.createBuffer();
+            let indiceBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
@@ -349,7 +344,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1.0, 1.14,
               1.6, 0.4,
               0.4, 0.4,
@@ -357,13 +352,13 @@
 
             /* Cabeza */
 
-            var verticesCabeza = new Float32Array(360 * 2);
+            let verticesCabeza = new Float32Array(360 * 2);
 
             // Desplazamiento (1.0, 1.42)
             let radio = 0.28;
             let k = 0;
             /* Lee los vértices (x,y) */
-            for (var i = 0; i < 360; i++) {
+            for (let i = 0; i < 360; i++) {
               verticesCabeza[k++] = 1.0 + radio * Math.cos(i * Math.PI / 180);
               verticesCabeza[k++] = 1.42 + radio * Math.sin(i * Math.PI / 180);
             }
@@ -371,7 +366,7 @@
             this.peonVAO = gl.createVertexArray();
             gl.bindVertexArray(this.peonVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -380,7 +375,7 @@
             this.cabezaVAO = gl.createVertexArray();
             gl.bindVertexArray(this.cabezaVAO);
 
-            var codigoVerticesCabeza = gl.createBuffer();
+            let codigoVerticesCabeza = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVerticesCabeza);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesCabeza), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -413,7 +408,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1+0.6,1-0.75,
               1-0.6,1-0.75,
               1-0.6,1-0.25,
@@ -439,7 +434,7 @@
             this.reyVAO = gl.createVertexArray();
             gl.bindVertexArray(this.reyVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -468,7 +463,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1-0.4,1-0.75,
               1-0.4,1-0.25,
               1+0.4,1-0.75,
@@ -495,7 +490,7 @@
             this.reinaVAO = gl.createVertexArray();
             gl.bindVertexArray(this.reinaVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -523,7 +518,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1-0.5,1+0.25,
               1+0,1+0.75,
               1+0.5,1+0.25,
@@ -538,7 +533,7 @@
             this.alfilVAO = gl.createVertexArray();
             gl.bindVertexArray(this.alfilVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -566,7 +561,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1-0.5,1-0.75,
               1+0.5,1+0.75,
               1+0.75,1-0.75,
@@ -584,7 +579,7 @@
             this.caballoVAO = gl.createVertexArray();
             gl.bindVertexArray(this.caballoVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -612,7 +607,7 @@
           constructor(gl) {
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
               1-0.5,1+0.3,
               1+0.5,1-0.75,
               1-0.5,1-0.75,
@@ -642,7 +637,7 @@
             this.torreVAO = gl.createVertexArray();
             gl.bindVertexArray(this.torreVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
@@ -668,8 +663,8 @@
 
         function interpolacionLineal(x0,y0,z0,x1,y1,z1){
           posicion = [];
-          for (var i = 0; i < 30; i++){
-            var t = i / 30;
+          for (let i = 0; i < 30; i++){
+            let t = i / 30;
             posicion[i] = [];
             posicion[i][0] = x0*(1-t) + x1*t;
             posicion[i][1] = y0*(1-t) + y1*t;
@@ -678,8 +673,8 @@
         }
 
         function mouseDown(event) {
-          var posx = new Number();
-          var posy = new Number();
+          let posx = new Number();
+          let posy = new Number();
 
           /* Obtiene la coordenada dentro de la área mayor */
           if (event.x != undefined && event.y != undefined) {
@@ -745,8 +740,8 @@
                 traslacion(_MatrizModelo, posicion[ipos][1]*2, posicion[ipos][0]*2, posicion[ipos][2]);
 
                 /* Se efectua los incrementos para la animación */
-                var fin = Date.now(); // Tiempo Final
-                var duracion = fin - inicio;
+                let fin = Date.now(); // Tiempo Final
+                let duracion = fin - inicio;
                 inicio = fin;
                 tiempo_real = duracion / 1000.0;
                 tiempoAnimacion = tiempoAnimacion - tiempo_real;
