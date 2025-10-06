@@ -39,42 +39,26 @@
         "use strict";
 
         /* Variables globales */
-        var canvas;
-        var programaID;
-        var gl;
+        let canvas;
+        let programaID;
+        let gl;
 
-        var circulo1;
-        var circulo2;
-        var circulo3;
-        var c1;
-        var c2;
-        var c3;
+        let circulo1, circulo2, circulo3;
+        let c1, c2, c3;
 
-        var rectangulo1;
-        var rectangulo2;
-        var rectangulo3;
-        var r1;
-        var r2;
-        var r3;
-
-        var xVelocidad_c1 =  0.1,  yVelocidad_c1 = 0;
-        var xVelocidad_c2 = -0.1,  yVelocidad_c2 = 0;
-        var xVelocidad_c3 =  0.03, yVelocidad_c3 = 0;
-
-        var xVelocidad_r1 =  0.05, yVelocidad_r1 = 0;
-        var xVelocidad_r2 = -0.05, yVelocidad_r2 = 0;
-        var xVelocidad_r3 = -0.03, yVelocidad_r3 = 0;
+        let rectangulo1, rectangulo2, rectangulo3;
+        let r1, r2, r3;
 
         /* Variables Uniformes */
-        var uColor;
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uColor;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -82,7 +66,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -90,7 +74,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -129,7 +113,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -139,7 +123,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -150,8 +134,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -162,8 +146,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -174,8 +158,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -201,8 +185,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -240,7 +224,7 @@
              */
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [
+            let vertices = [
                0, 0, // 0
                2, 0, // 1
                2, 1, // 2
@@ -256,7 +240,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -296,12 +280,13 @@
         class Rectangulo {
 
           // Métodos
-          constructor(x, y, ancho, alto) {
+          constructor(x, y, ancho, alto, velocidad) {
             // Atributos
             this.x = x;
             this.y = y;
             this.ancho = ancho;
             this.alto = alto;
+            this.velocidad = velocidad;
           }
         }
 
@@ -321,10 +306,10 @@
              */
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [];
+            let vertices = [];
 
             /* Lee los vértices (x,y) y colores (r,g,b,a) */
-            for (var i = 0; i < 360; i++) {
+            for (let i = 0; i < 360; i++) {
                vertices.push(radio * Math.cos(i * Math.PI / 180));
                vertices.push(radio * Math.sin(i * Math.PI / 180));
             }
@@ -337,7 +322,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -376,11 +361,12 @@
 
         class Circulo {
           // Métodos
-          constructor(x, y, radio) {
+          constructor(x, y, radio, velocidad) {
             // Atributos
             this.x = x;
             this.y = y;
             this.radio = radio;
+            this.velocidad = velocidad;
           }
         }
 
@@ -389,65 +375,25 @@
         /***************************************************************************/
 
         function playOgg(archivo){
-          var archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
+          let archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
           document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + archivoOgg + '</audio>';
         }
 
         function playMp3(archivo){
-          var archivoMp3 = '<source src="' + archivo + '.mp3" type="audio/mpeg">';
+          let archivoMp3 = '<source src="' + archivo + '.mp3" type="audio/mpeg">';
           document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + archivoOgg + '</audio>';
         }
 
         /***************************************************************************/
-        /* Funciones que dibujan los circulos y los rectángulos                    */
+        /* Funciones que dibujan las figuras                                       */
         /***************************************************************************/
 
-        function dibujaCirculo1(gl) {
+        function dibujaFigura(gl, fig, x, y, color) {
           identidad(MatrizModelo);
-          traslacion(MatrizModelo, c1.x, c1.y, 0);
+          traslacion(MatrizModelo, x, y, 0);
           gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 0, 1, 0, 1);
-          circulo1.dibuja(gl);
-        }
-
-        function dibujaCirculo2(gl) {
-          identidad(MatrizModelo);
-          traslacion(MatrizModelo, c2.x, c2.y, 0);
-          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 1, 1, 0, 1);
-          circulo2.dibuja(gl);
-        }
-
-        function dibujaCirculo3(gl) {
-          identidad(MatrizModelo);
-          traslacion(MatrizModelo, c3.x, c3.y, 0);
-          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 1, 0, 1, 1);
-          circulo3.dibuja(gl);
-        }
-
-        function dibujaRectangulo1(gl) {
-          identidad(MatrizModelo);
-          traslacion(MatrizModelo, r1.x, r1.y, 0);
-          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 1, 0, 0, 1);
-          rectangulo1.dibuja(gl);
-        }
-
-        function dibujaRectangulo2(gl) {
-          identidad(MatrizModelo);
-          traslacion(MatrizModelo, r2.x, r2.y, 0);
-          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 0, 0, 1, 1);
-          rectangulo2.dibuja(gl);
-        }
-
-        function dibujaRectangulo3(gl) {
-          identidad(MatrizModelo);
-          traslacion(MatrizModelo, r3.x, r3.y, 0);
-          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
-          gl.uniform4f(uColor, 0, 1, 1, 1);
-          rectangulo3.dibuja(gl);
+          gl.uniform4fv(uColor, color);
+          fig.dibuja(gl);
         }
 
         /***************************************************************************/
@@ -455,9 +401,9 @@
         /***************************************************************************/
 
         /* Verifica la colisión de un rectángulo con otro rectángulo */
-        function seSobreponenRR(r1, r2) {
-          return (r1.x < r2.x + r2.ancho && r1.x + r1.ancho >  r2.x  &&
-            r1.y < r2.y + r2.alto && r1.y + r1.alto > r2.y);
+        function colisionRR(a, b) {
+          return (a.x < b.x + b.ancho && a.x + a.ancho >  b.x  &&
+            a.y < b.y + b.alto && a.y + a.alto > b.y);
         }
 
         function distancia2(x1, y1, x2, y2) {
@@ -465,16 +411,16 @@
         }
 
         /* Verifica la colisión de un circulo con otro circulo */
-        function seSobreponenCC(c1, c2) {
-          var distanciaCentros2 = distancia2(c1.x, c1.y, c2.x, c2.y);
-          var sumaRadios2 =(c1.radio + c2.radio) * (c1.radio + c2.radio);
+        function colisionCC(c1, c2) {
+          let distanciaCentros2 = distancia2(c1.x, c1.y, c2.x, c2.y);
+          let sumaRadios2 =(c1.radio + c2.radio) * (c1.radio + c2.radio);
           return distanciaCentros2 <= sumaRadios2;
         }
 
         /* Verifica la colisión de un circulo con un rectángulo */
-        function seSobreponenCR(c, r) {
-          var x0 = c.x;
-          var y0 = c.y;
+        function colisionCR(c, r) {
+          let x0 = c.x;
+          let y0 = c.y;
 
           if (c.x < r.x) {
             x0 = r.x;
@@ -488,14 +434,14 @@
             y0 = r.y + r.alto;
           }
 
-          var d2 = distancia2(c.x, c.y, x0, y0); 
+          let d2 = distancia2(c.x, c.y, x0, y0); 
           return  d2 < c.radio * c.radio;
         }
 
-        var inicio = Date.now();
+        let inicio = Date.now();
         function incremento() {
-          var fin = Date.now();
-          var duracion = fin - inicio;
+          let fin = Date.now();
+          let duracion = fin - inicio;
           inicio = fin;
           return 45 * duracion / 1000.0;
         }
@@ -509,58 +455,61 @@
           gl.clear(gl.COLOR_BUFFER_BIT);
 
           /* Colisión de dos circulos */
-          dibujaCirculo1(gl);
-          dibujaCirculo2(gl);
+          c1.x = c1.x + c1.velocidad;
+          c2.x = c2.x + c2.velocidad;
 
-          if (seSobreponenCC(c1, c2)) {
+          if (colisionCC(c1, c2)) {
             playOgg("0437");
-            xVelocidad_c1 = -xVelocidad_c1;
-            xVelocidad_c2 = -xVelocidad_c2;
+            c1.velocidad = -c1.velocidad;
+            c2.velocidad = -c2.velocidad;
           } 
 
-          c1.x = c1.x + xVelocidad_c1;
           if (c1.x < -4.5 || c1.x > 4.5) // limite
-            xVelocidad_c1 = -xVelocidad_c1;
+            c1.velocidad = -c1.velocidad;
 
-          c2.x = c2.x + xVelocidad_c2;
           if (c2.x < -4.5 || c2.x > 4.5 ) // limite
-            xVelocidad_c2 = -xVelocidad_c2;
+            c2.velocidad = -c2.velocidad;
+          
+          dibujaFigura(gl, circulo1, c1.x, c1.y, [0,1,0,1]);
+          dibujaFigura(gl, circulo2, c2.x, c2.y, [1,1,0,1]);
 
           /* Colisión de dos rectángulos */
-          dibujaRectangulo1(gl);
-          dibujaRectangulo2(gl);
+          r1.x = r1.x + r1.velocidad;
+          r2.x = r2.x + r2.velocidad;
 
-          if (seSobreponenRR(r1, r2)) {
+          if (colisionRR(r1, r2)) {
             playOgg("0438");
-            xVelocidad_r1 = -xVelocidad_r1;
-            xVelocidad_r2 = -xVelocidad_r2;
+            r1.velocidad = -r1.velocidad;
+            r2.velocidad = -r2.velocidad;
           }
 
-          r1.x = r1.x + xVelocidad_r1;
           if (r1.x < -7 || r1.x > 7) // limite
-            xVelocidad_r1 = -xVelocidad_r1;
+            r1.velocidad = -r1.velocidad;
 		
-          r2.x = r2.x + xVelocidad_r2;
           if (r2.x < -5 || r2.x > 5) // limite
-            xVelocidad_r2 = -xVelocidad_r2;
+            r2.velocidad = -r2.velocidad;
+
+          dibujaFigura(gl, rectangulo1, r1.x, r2.y, [1,0,0,1]);
+          dibujaFigura(gl, rectangulo2, r2.x, r2.y, [0,0,1,1]);
 
           /* Colisión circulo y rectángulo */
-          dibujaCirculo3(gl);
-          dibujaRectangulo3(gl);
+          c3.x = c3.x + c3.velocidad;
+          r3.x = r3.x + r3.velocidad;          
 
-          if (seSobreponenCR(c3, r3)) {
+          if (colisionCR(c3, r3)) {
             playOgg("0564");
-            xVelocidad_c3 = -xVelocidad_c3;
-            xVelocidad_r3 = -xVelocidad_r3;
+            c3.velocidad = -c3.velocidad;
+            r3.velocidad = -r3.velocidad;
           }
 
-          c3.x = c3.x + xVelocidad_c3;
           if (c3.x < -5 || c3.x > 5) // limite
-            xVelocidad_c3 = -xVelocidad_c3;
+            c3.velocidad = -c3.velocidad;
 
-          r3.x = r3.x + xVelocidad_r3;
           if (r3.x < -5 || r3.x > 5) // limite
-            xVelocidad_r3 = -xVelocidad_r3;
+            r3.velocidad = -r3.velocidad;
+
+          dibujaFigura(gl, circulo3, c3.x, c3.y, [1,0,1,1]);
+          dibujaFigura(gl, rectangulo3, r3.x, r3.y, [0,1,1,1]);
 
           /* Solicita que el navegador llame nuevamente a dibuja */
           requestAnimationFrame(dibuja, canvas);
@@ -583,16 +532,16 @@
           circulo1 = new CirculoGrafico(gl, 0.5);
           circulo2 = new CirculoGrafico(gl, 0.5);
           circulo3 = new CirculoGrafico(gl, 0.5);
-          c1 = new Circulo(-2, 3, 0.5);
-          c2 = new Circulo(2, 3, 0.5);
-          c3 = new Circulo(-5, -2.5, 0.5);
+          c1 = new Circulo(-2, 3, 0.5, 0.1);
+          c2 = new Circulo(2, 3, 0.5, -0.1);
+          c3 = new Circulo(-5, -2.5, 0.5, 0.03);
 
           rectangulo1 = new RectanguloGrafico(gl);
           rectangulo2 = new RectanguloGrafico(gl);
           rectangulo3 = new RectanguloGrafico(gl);
-          r1 = new Rectangulo(-2, 0, 2, 1);
-          r2 = new Rectangulo(2, 0, 2, 1);
-          r3 = new Rectangulo(5, -3, 2, 1);
+          r1 = new Rectangulo(-2, 0, 2, 1, 0.05);
+          r2 = new Rectangulo(2, 0, 2, 1, -0.05);
+          r3 = new Rectangulo(5, -3, 2, 1, -0.03);
 
           /* Paso 4: Se obtiene los ID de las variables de entrada de los shaders    */
           gl.useProgram(programaID);
@@ -606,9 +555,9 @@
           gl.uniformMatrix4fv(uMatrizProyeccion, false, MatrizProyeccion);
 
           /* Paso 6: Se renderizan los objetos                                       */
-          gl.clearColor(0.0, 0.0, 0.0, 1.0);
           identidad(MatrizVista);
           gl.uniformMatrix4fv(uMatrizVista, false, MatrizVista);
+          gl.clearColor(0.0, 0.0, 0.0, 1.0);
           dibuja();          
         }
 
