@@ -89,33 +89,32 @@
       <script>
         'use strict';
 
-        var programaID;
-        var gl;
-        var grafico;  // para dibujar en el lienzo que muestra la textura
-        var rectanguloVAO;
+        let programaID;
+        let gl;
+        let grafico;  // para dibujar en el lienzo que muestra la textura
+        let rectanguloVAO;
 
-        var uMatrizProyeccion;
-        var uMatrizVistaModelo;
-        var uUnidadDeTextura0;
-        var uMatrizTextura;
+        let uMatrizProyeccion;
+        let uMatrizVistaModelo;
+        let uUnidadDeTextura0;
+        let uMatrizTextura;
 
-        var MatrizModelo = new Array(16);
-        var MatrizProyeccion = new Array(16);
-        var MatrizTextura = new Array(16);
+        let MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizTextura = new Array(16);
 
         /* Código o handle de la textura */
-        var codigoDeTextura = [];
+        let codigoDeTextura = [];
 
-        var sliderEscala, sliderTrasladaX, sliderTrasladaY, sliderRota;
+        let sliderEscala, sliderTrasladaX, sliderTrasladaY, sliderRota;
 
-        var escala = 1;
-        var tx = 0;
-        var ty = 0;
-        var angulo = 0;
-        var cargandoImagenes = true;
+        let escala = 1;
+        let tx = 0, ty = 0;
+        let angulo = 0;
+        let cargandoImagenes = true;
 
-        var texturaImagenes = new Array();  // Contendrá objetos de imagen.
-        var textureImageURLs = [
+        let texturaImagenes = new Array();  // Contendrá objetos de imagen.
+        let textureImageURLs = [
           "texturas/colibri.jpg",
           "texturas/brick001.jpg",
           "texturas/Earth-1024x512.jpg",
@@ -130,7 +129,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -138,7 +137,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -174,7 +173,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -184,7 +183,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -195,8 +194,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -207,8 +206,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -219,8 +218,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -246,8 +245,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -286,7 +285,7 @@
            */
 
           /* Las coordenadas cartesianas (x, y) */
-          var vertices = [
+          let vertices = [
              -3, -3, // 0
               3, -3, // 1
               3,  3, // 2
@@ -294,7 +293,7 @@
           ];
 
           /* Lee las coordenadas de textura (u,v) */
-          var coord_textura = [ 
+          let coord_textura = [ 
               0, 0, // 0
               1, 0, // 1
               1, 1, // 2
@@ -302,7 +301,7 @@
           ];
 
           /* Indices */
-          var indices = [ 
+          let indices = [ 
              0,  1,  2,
              0,  2,  3, 
           ];
@@ -315,7 +314,7 @@
 
 
           /* Se genera un nombre (código) para el buffer */ 
-          var verticeBuffer = gl.createBuffer();
+          let verticeBuffer = gl.createBuffer();
 
           /* Se asigna un nombre (código) al buffer */
           gl.bindBuffer(gl.ARRAY_BUFFER, verticeBuffer);
@@ -331,7 +330,7 @@
 
 
           /* Se genera un nombre (código) para el buffer */ 
-          var coordTextBuffer = gl.createBuffer();
+          let coordTextBuffer = gl.createBuffer();
 
           /* Se asigna un nombre (código) al buffer */
           gl.bindBuffer(gl.ARRAY_BUFFER, coordTextBuffer);
@@ -347,7 +346,7 @@
 
 
           /* Se genera un nombre (código) para el buffer */
-          var indiceBuffer = gl.createBuffer();
+          let indiceBuffer = gl.createBuffer();
 
           /* Se asigna un nombre (código) al buffer */
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
@@ -408,7 +407,7 @@
             return;
           }
 
-          var numTextura = Number(document.getElementById("textura").value);
+          let numTextura = Number(document.getElementById("textura").value);
           document.getElementById("canvastextura").style.backgroundImage = "url('" + textureImageURLs[numTextura] + "')";
 
           /* Genera un nombre (código) para la textura */
@@ -421,7 +420,7 @@
           gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 
           /* Obtiene la imagen */
-          var imagen = texturaImagenes[numTextura];
+          let imagen = texturaImagenes[numTextura];
 
           /* Se lee la textura */
           /* |  tipo   |0=1 resol|RGB/RGBA |orden col|tip datos| buffer  | */
@@ -483,8 +482,8 @@
         /* Paso 5: Se prepara el lienzo y se obtiene el contexto del WebGL.        */
         /***************************************************************************/
         function cargaImagenes() {
-          var loadedCt = 0;
-          for (var i = 0; i < textureImageURLs.length; i++) {
+          let loadedCt = 0;
+          for (let i = 0; i < textureImageURLs.length; i++) {
             texturaImagenes[i] = new Image();
             texturaImagenes[i].onload = imagenCargada;
             texturaImagenes[i].src = textureImageURLs[i];
@@ -537,9 +536,9 @@
         }
 
         function main() {
-          var canvastextura = document.getElementById("canvastextura");
+          let canvastextura = document.getElementById("canvastextura");
           grafico = canvastextura.getContext('2d');
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
           gl = canvas.getContext("webgl2");
 
           if (!gl) {
