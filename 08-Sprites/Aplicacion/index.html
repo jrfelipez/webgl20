@@ -59,56 +59,46 @@
         'use strict';
 
         /* Variables globales */
-        var gl, canvas;
-        var programaID;
-        var texturaCesped;
-        var texturaSuelo;
-        var texturaPatoVuela;
-        var texturaPatoMuere;
-        var texturaPatoCae;
-        var codigoCesped;
-        var codigoSuelo;
-        var codigoPatoVuela;
-        var codigoPatoMuere;
-        var codigoPatoCae;
+        let gl, canvas;
+        let programaID;
+        let texturaCesped, texturaSuelo, texturaPatoVuela, texturaPatoMuere, texturaPatoCae;
+        let codigoCesped, codigoSuelo, codigoPatoVuela, codigoPatoMuere, codigoPatoCae;
 
         /* Variables Uniformes */
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
-        var uUnidadDeTextura;
-        var uMatrizTextura;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
+        let uUnidadDeTextura;
+        let uMatrizTextura;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
-        var MatrizTextura = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
+        let MatrizTextura = new Array(16);
 
         /* Tamaño de la ventana en coordenadas de OpenGL */
-        var anchoOpenGL;
-        var anchoOpenGLpor2; 
-      	var altoOpenGL;
-      	var altoOpenGLpor2;
+        let anchoOpenGL, anchoOpenGLpor2; 
+      	let altoOpenGL, altoOpenGLpor2;
 
         /* Se almacena el desplazamiento */
-        var dx_Pato = -16;
-        var dy_Pato = 4;
+        let dx_Pato = -16;
+        let dy_Pato = 4;
 
         /* Para la traslación de la textura */
-        var du_Vuela = 0;
-        var du_Cae = 0;
+        let du_Vuela = 0;
+        let du_Cae = 0;
 
         /* Estado de la animación */
-        var estado = 1;
+        let estado = 1;
 
         /* Variables de la animación */
-        var tiempo_real,fin, duracion;
-        var inicio = Date.now(); // Tiempo Inicial
+        let tiempo_real,fin, duracion;
+        let inicio = Date.now(); // Tiempo Inicial
         const PERIODO_VUELO = 100/1000; // 100 milisegundos c/cuadro
-        var tiempoVuelo = PERIODO_VUELO;
+        let tiempoVuelo = PERIODO_VUELO;
         const PERIODO_CAIDA = 50/1000; // 50 milisegundos c/c
-        var tiempoCaida = PERIODO_CAIDA;
+        let tiempoCaida = PERIODO_CAIDA;
 
         /***************************************************************************/
         /* Paso 2: Se crean, compilan y enlazan los programas Shader               */
@@ -116,7 +106,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -124,7 +114,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -160,7 +150,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -170,7 +160,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -181,8 +171,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -193,8 +183,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -205,8 +195,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -232,8 +222,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -261,13 +251,13 @@
         /***************************************************************************/
         class Rectangulo {
           constructor(gl,x1,y1,x2,y2,u1,v1,u2,v2) {
-            var vertices = new Float32Array(8);
+            let vertices = new Float32Array(8);
             vertices[0] = x1; vertices[1] = y1; // 0
             vertices[2] = x2; vertices[3] = y1; // 1
             vertices[4] = x2; vertices[5] = y2; // 2
             vertices[6] = x1; vertices[7] = y2; // 3
 
-            var coord_textura = new Float32Array(8);
+            let coord_textura = new Float32Array(8);
             coord_textura[0] = u1; coord_textura[1] = v1; // 0
             coord_textura[2] = u2; coord_textura[3] = v1; // 1
             coord_textura[4] = u2; coord_textura[5] = v2; // 2
@@ -276,13 +266,13 @@
             this.rectanguloVAO = gl.createVertexArray();
             gl.bindVertexArray(this.rectanguloVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 
-            var codigoCoordenadasDeTextura = gl.createBuffer();
+            let codigoCoordenadasDeTextura = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoCoordenadasDeTextura);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coord_textura), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(1);
@@ -309,7 +299,7 @@
         }
 
         function playOgg(archivo){
-          var archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
+          let archivoOgg = '<source src="' + archivo + '.ogg" type="audio/ogg">';
           document.getElementById("sound").innerHTML='<audio autoplay="autoplay">' + archivoOgg + '</audio>';
         }
 
@@ -318,8 +308,8 @@
         }
 
         function mouseDown(event) {
-          var posx = new Number();
-          var posy = new Number();
+          let posx = new Number();
+          let posy = new Number();
 
           /* Obtiene la coordenada dentro de la área mayor */
           if (event.x != undefined && event.y != undefined) {
