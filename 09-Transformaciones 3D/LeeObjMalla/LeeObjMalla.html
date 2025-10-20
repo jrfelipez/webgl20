@@ -1,24 +1,33 @@
 ﻿<!DOCTYPE HTML>
 <html>
 <head>
+  <style type="text/css">
+    #canvas-holder {
+      float:left;
+      margin-right:10px;
+    }
+    #opciones {
+      float:left;
+      background-color:white;
+      margin-top: 50pt;
+      padding: 8px
+    }
+  </style>  
   <title>Objeto Malla en WebGL 2.0</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
-   <body>
-      <div id="content">
-
-      <h2>Objeto Malla en WebGL 2.0</h2>
-
-      <div id="tools">
-        <h3>Opciones:</h3>
+<body>
+  <div id="content">
+    <h2>Objeto Malla en WebGL 2.0</h2>
+    <div id="canvas-holder">
+      <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+    </div>
+    <div id="opciones">
+      <fieldset>
         <p><label><input type="checkbox" id="animacion"> <b>Animación</b></label></p>
-      </div>
-  
-      <div id="canvas-holder">
-        <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
-      </div>
-
-      </div>
+      </fieldset>
+    </div>
+  </div>  
 
       <!--
         /***************************************************************************/
@@ -51,38 +60,38 @@
         "use strict";
 
         /* Variables globales */
-        var programaID;
-        var gl;
-        var objeto;
+        let programaID;
+        let gl;
+        let objeto;
 
         /* Variables Uniformes */
-        var uColor;
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uColor;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /* Incremento del ángulo de la animación */
-        var rotX = 0;
-        var rotY = 0;
-        var rotZ = 0;
+        let rotX = 0;
+        let rotY = 0;
+        let rotZ = 0;
         const INCX = 0.3;
         const INCY = 0.2;
         const INCZ = 0.4;
-        var incX = 0;
-        var incY = 0;
-        var incZ = 0;
+        let incX = 0;
+        let incY = 0;
+        let incZ = 0;
 
-        var animacion = false;
+        let animacion = false;
 
         const PERIODO_MOVIMIENTO = 0.0167; // 1/60 = 0.0167 (60 cuadros por 1 seg.)
-        var tiempo_real;
-        var tiempoMovimiento = PERIODO_MOVIMIENTO;
-        var inicio = Date.now(); // Tiempo Inicial
+        let tiempo_real;
+        let tiempoMovimiento = PERIODO_MOVIMIENTO;
+        let inicio = Date.now(); // Tiempo Inicial
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -90,7 +99,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -98,7 +107,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -137,7 +146,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -147,7 +156,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -158,8 +167,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -170,8 +179,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -182,8 +191,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -209,8 +218,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -238,15 +247,15 @@
         /***********************************************************************************/
         class Objeto {
           constructor(gl, nombreArchivo) {
-            var lineas, token, x, y, z, a, b;
-            var minX, maxX, minY, maxY, minZ, maxZ;
-            var numVertices;
+            let lineas, token, x, y, z, a, b;
+            let minX, maxX, minY, maxY, minZ, maxZ;
+            let numVertices;
 
             /* Las coordenadas cartesianas (x, y, z) */
-            var vertices = [];
+            let vertices = [];
 
             /* Indices */
-            var indices = [];
+            let indices = [];
 
             /* Número de Vértices */
             numVertices = 0;
@@ -255,7 +264,7 @@
             this.numLineas = 0;
 
             /* Lee el archivo .obj */
-            var datos_obj = this.leeArchivo(nombreArchivo);
+            let datos_obj = this.leeArchivo(nombreArchivo);
 
             /* Divide por lineas */
             lineas = datos_obj.split("\n");
@@ -289,7 +298,7 @@
 
                     this.numLineas++;
 
-                    var tokenEntero = this.getInt();
+                    let tokenEntero = this.getInt();
 
                     while (tokenEntero != null) {
                       b = tokenEntero-1;
@@ -309,14 +318,14 @@
             }
 
             /* Redimensiona las coordenadas entre [-1,1] */
-            var tam_max = 0, escala;
+            let tam_max = 0, escala;
             tam_max = Math.max(tam_max, maxX-minX);
             tam_max = Math.max(tam_max, maxY-minY);
             tam_max = Math.max(tam_max, maxZ-minZ);
             escala = 2.0 / tam_max;
 
             /* Actualiza los vértices */
-            for (var i = 0; i < numVertices * 3; i += 3) {
+            for (let i = 0; i < numVertices * 3; i += 3) {
               vertices[i  ] = escala * (vertices[i  ] - minX) - 1.0;
               vertices[i+1] = escala * (vertices[i+1] - minY) - 1.0;
               vertices[i+2] = escala * (vertices[i+2] - minZ) - 1.0;
@@ -324,25 +333,25 @@
 
             console.log("Cant. vertices: ",vertices.length/3);
             console.log(vertices.length);
-            for (var i = 0; i < vertices.length; i+=3) {
+            for (let i = 0; i < vertices.length; i+=3) {
               console.log(i + " : " + vertices[i] + "  " + vertices[i+1] + "  " + vertices[i+2])
             }
 
             console.log(indices.length);
-            for (var i = 0; i < indices.length; i+=6) {
+            for (let i = 0; i < indices.length; i+=6) {
               console.log(i + " : " + indices[i] + "  " + indices[i+1] + "  " + indices[i+2] + "  " + indices[i+3] + "  " + indices[i+4] + "  " + indices[i+5])
             }
 
             this.objetoVAO = gl.createVertexArray();
             gl.bindVertexArray(this.objetoVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
-            var codigoDeIndices = gl.createBuffer();
+            let codigoDeIndices = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, codigoDeIndices);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
@@ -359,8 +368,8 @@
 
           /* Lee el archivo OBJ */
           leeArchivo(nombreArchivo){
-            var byteArray = [];
-            var request = new XMLHttpRequest();
+            let byteArray = [];
+            let request = new XMLHttpRequest();
             request.onreadystatechange = function () {
               if (request.readyState === 4 && request.status !== 404) {
                 byteArray = request.responseText
@@ -395,7 +404,7 @@
           };
 
           obtLongPalabra(pos) {
-            var i = pos;
+            let i = pos;
             while (i < this.cadena.length &&
                     !this.esDelimitador(this.cadena.charAt(i))) {
                  i++;
@@ -404,7 +413,7 @@
           };
 
           getToken() {
-            var n, subcadena;
+            let n, subcadena;
             this.saltaDelimitadores();
             n = this.obtLongPalabra(this.indice);
             if (n === 0) {
@@ -416,7 +425,7 @@
           }
 
           getInt() {
-            var token = this.getToken();
+            let token = this.getToken();
             if (token) {
               return parseInt(token, 10); // Retorna un número entero
             }
@@ -424,7 +433,7 @@
           }
 
           getFloat() {
-            var token = this.getToken();
+            let token = this.getToken();
             if (token) {
               return parseFloat(token); // Retorna un número en punto flotante
             }
@@ -445,8 +454,8 @@
           objeto.dibuja(gl);
 
           /* Se efectua loa incrementos para la animación */
-          var fin = Date.now(); // Tiempo Final
-          var duracion = fin - inicio;
+          let fin = Date.now(); // Tiempo Final
+          let duracion = fin - inicio;
           inicio = fin;
           tiempo_real = duracion / 1000.0;
           tiempoMovimiento = tiempoMovimiento - tiempo_real;
@@ -462,7 +471,7 @@
         }
 
         function animacionCheckbox() {
-          var r = document.getElementById("animacion").checked
+          let r = document.getElementById("animacion").checked
           if (r != animacion) {
             animacion = r;
             incX = incX == 0 ? INCY : 0;
@@ -473,7 +482,7 @@
         }
 
         function main() {
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
           gl = canvas.getContext("webgl2");
           if (!gl) {
              document.write("WebGL 2.0 no está disponible en tu navegador");
