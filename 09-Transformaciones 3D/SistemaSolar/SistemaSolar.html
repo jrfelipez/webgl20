@@ -1,8 +1,6 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 <head>
-  <title>Sistema Solar en WebGL 2.0</title>
-  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
   <style type="text/css">
     #canvas-holder {
       float:left;
@@ -15,31 +13,30 @@
       margin-top: 50pt;
       padding: 8px
     }
-  </style>
+  </style>  
+  <title>Sistema Solar en WebGL 2.0</title>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
-   <body>
-      <div id="content">
-
-      <div id="canvas-holder">
+<body>
+  <div id="content">
+    <div id="canvas-holder">
       <h2>Sistema Solar en WebGL 2.0</h2>
       <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
-      </div>
-
-      <div id="menu">
-       <p><label><b>Teclas:</b></p>
-         <p style="margin-left: 20px"><b>s</b>&emsp;&nbsp;Animación de un SOLO paso</p>
-         <p style="margin-left: 20px"><b>Tecla arriba</b>&emsp;&nbsp;Cada pulsación de tecla multiplica los tiempos por un factor de dos.</p>
-         <p style="margin-left: 20px"><b>Tecla abajo </b>&emsp;&nbsp;Cada pulsación de tecla divide los tiempos por un factor de dos.</p>
-         <p style="margin-left: 20px"><b>Esc</b>  Sale del programa</p>
-       <p><label><b>Opciones:</b></p>
-         <p><label><input type="checkbox" id="animacion"> <b>Animación</b></label></p>
-      </div>
-
-      </div>
+    </div>
+    <div id="menu">
+      <p><label><b>Teclas:</b></p>
+        <p style="margin-left: 20px"><b>s</b>&emsp;&nbsp;AnimaciÃ³n de un SOLO paso</p>
+        <p style="margin-left: 20px"><b>Tecla arriba</b>&emsp;&nbsp;Cada pulsaciÃ³n de tecla multiplica los tiempos por un factor de dos.</p>
+        <p style="margin-left: 20px"><b>Tecla abajo </b>&emsp;&nbsp;Cada pulsaciÃ³n de tecla divide los tiempos por un factor de dos.</p>
+        <p style="margin-left: 20px"><b>Esc</b>  Sale del programa</p>
+      <p><label><b>Opciones:</b></p>
+        <p><label><input type="checkbox" id="animacion"> <b>AnimaciÃ³n</b></label></p>
+    </div>
+  </div>
 
       <!--
         /***************************************************************************/
-        /* Paso 1: Se definen los códigos shaders.                                 */
+        /* Paso 1: Se definen los cÃ³digos shaders.                                 */
         /***************************************************************************/
       -->
       <script id="vs" type="vertex">
@@ -67,34 +64,34 @@
         "use strict";
 
         /* Variables globales */
-        var canvas;
-        var programaID;
-        var gl;
-        var sol;
-        var tierra;
-        var luna;
+        let canvas;
+        let programaID;
+        let gl;
+        let sol;
+        let tierra;
+        let luna;
 
         /* Variables Uniformes */
-        var uColor;
-        var uMatrizModelo;
-        var uMatrizProyeccion;
+        let uColor;
+        let uMatrizModelo;
+        let uMatrizProyeccion;
 
         /* Matrices */
-        var MatrizModelo = new Array(16);
-        var MatrizProyeccion = new Array(16);
+        let MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
 
-	// Estas tres variables controlan el estado de la animación y su velocidad.
-        var horasPorDia = 0.0;
-        var diasPorAnio = 0.0;
-        var tiempoDeLaAnimacion = 24.0; // Tiempo de incremento para la animación (horas)
-        var animacion = true;
-        var simplePaso = false;
+	      // Estas tres variables controlan el estado de la animaciÃ³n y su velocidad.
+        let horasPorDia = 0.0;
+        let diasPorAnio = 0.0;
+        let tiempoDeLaAnimacion = 24.0; // Tiempo de incremento para la animaciÃ³n (horas)
+        let animacion = true;
+        let simplePaso = false;
 
-        /* Variables del tiempo de ejecución */
+        /* Variables del tiempo de ejecuciÃ³n */
         const PERIODO_DE_LA_ROTACION = 0.001; // en segundos
-        var tiempo_real;
-        var tiempoRotacion = PERIODO_DE_LA_ROTACION;
-        var inicio = Date.now(); // Tiempo Inicial
+        let tiempo_real;
+        let tiempoRotacion = PERIODO_DE_LA_ROTACION;
+        let inicio = Date.now(); // Tiempo Inicial
 
         /***************************************************************************/
         /* Paso 2: Se crean, compilan y enlazan los programas Shader               */
@@ -102,7 +99,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -110,7 +107,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -131,7 +128,7 @@
         }
 
         /***************************************************************************/
-        /* Transformación de las Matrices                                          */
+        /* TransformaciÃ³n de las Matrices                                          */
         /***************************************************************************/
 
         /* Convierte de grados a radianes */
@@ -147,9 +144,9 @@
           r[3] = 0; r[7] = 0; r[11] = 0; r[15] = 1;
         }
 
-        /* Traslación - glTranslatef */
+        /* TraslaciÃ³n - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -157,9 +154,9 @@
           multiplica(matriz, matriz, r);
         }
 
-        /* Escalación - glScalef */
+        /* EscalaciÃ³n - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -167,11 +164,11 @@
           multiplica(matriz, matriz, r);
         }
 
-        /* Rotación sobre X - glRotatef */
+        /* RotaciÃ³n sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -179,11 +176,11 @@
           multiplica(matriz, matriz, r); 
         }
 
-        /* Rotación sobre Y - glRotatef */
+        /* RotaciÃ³n sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -191,11 +188,11 @@
           multiplica(matriz, matriz, r);
         }
 	
-        /* Rotación sobre Z - glRotatef */
+        /* RotaciÃ³n sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -203,7 +200,7 @@
           multiplica(matriz, matriz, r);
         }
 
-        /* Proyección Paralela - glOrtho */
+        /* ProyecciÃ³n Paralela - glOrtho */
         function ortho(r, izq, der, abj, arr, cerca, lejos) {
           r[0] = 2/(der - izq); r[4] =             0; r[ 8] =                  0; r[12] =         -(der + izq)/(der - izq);
           r[1] =             0; r[5] = 2/(arr - abj); r[ 9] =                  0; r[13] =         -(arr + abj)/(arr - abj);
@@ -211,7 +208,7 @@
           r[3] =             0; r[7] =             0; r[11] =                  0; r[15] =                                1;
         }
 
-        /* Proyección Perspectiva - glFrustum */
+        /* ProyecciÃ³n Perspectiva - glFrustum */
         function frustum(r, izq, der, abj, arr, cerca, lejos) {
           r[0] = 2*cerca/(der-izq); r[4] =                 0; r[ 8] =          (der+izq)/(der-izq); r[12] =                            0;
           r[1] =                 0; r[5] = 2*cerca/(arr-abj); r[ 9] =          (arr+abj)/(arr-abj); r[13] =                            0;
@@ -219,17 +216,17 @@
           r[3] =                 0; r[7] =                 0; r[11] =                           -1; r[15] =                            0;
         }
 
-        /* Proyección Perspectiva - gluPerspective */
+        /* ProyecciÃ³n Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
           r[3] =         0; r[7] = 0; r[11] =                              - 1.0; r[15] =                                       0;
         }
 
-        /* Multiplicación de matrices de 4 x 4 */
+        /* MultiplicaciÃ³n de matrices de 4 x 4 */
         function multiplica(c, a, b) {
           let r = new Array(16);
           let i, j, k;
@@ -247,7 +244,7 @@
 
 
         /***************************************************************************/
-        /* Paso 3: Se define la geometría y se almacenan en los buffers de memoria.*/
+        /* Paso 3: Se define la geometrÃ­a y se almacenan en los buffers de memoria.*/
         /***************************************************************************/
         class Esfera {
 
@@ -265,7 +262,7 @@
              *     |        6|14       |
              *    2 ---------|--------- 10
              *        \      |      /
-             *            \  |  /                   3 segmentos vérticales (1/2 vuelta)
+             *            \  |  /                   3 segmentos vÃ©rticales (1/2 vuelta)
              *            3,7,15,11
              *    
              *          1,2      3,4 segmentos horizontales (1 vuelta)
@@ -284,30 +281,30 @@
             this.cantidadDeIndices = segmentosH * segmentosV * 6; // 6 vert (c/cuadrado)
 
             /* Las coordenadas cartesianas (x, y) */
-            var vertices = [];
+            let vertices = [];
 
             /* Indices */
-            var indices = []; 
+            let indices = []; 
 
             /* Se leen los vertices y las normales */
 
-            var inc_phi = 360 / segmentosH; // 1 vuelta
+            let inc_phi = 360 / segmentosH; // 1 vuelta
 		
             // longitud
-            for (var phi = 0; phi < 360; phi += inc_phi) {
-              var sp = Math.sin(toRadians(phi));
-              var cp = Math.cos(toRadians(phi));
-              var sp1 = Math.sin(toRadians(phi + inc_phi));
-              var cp1 = Math.cos(toRadians(phi + inc_phi));
+            for (let phi = 0; phi < 360; phi += inc_phi) {
+              let sp = Math.sin(toRadians(phi));
+              let cp = Math.cos(toRadians(phi));
+              let sp1 = Math.sin(toRadians(phi + inc_phi));
+              let cp1 = Math.cos(toRadians(phi + inc_phi));
 			
-              var inc_theta = 180 / segmentosV; // 1/2 vuelta
+              let inc_theta = 180 / segmentosV; // 1/2 vuelta
 			
               // latitud
-              for (var theta = 0; theta < 180; theta += inc_theta) {
-                var st = Math.sin(toRadians(theta));
-                var ct = Math.cos(toRadians(theta));
-                var st1 = Math.sin(toRadians(theta + inc_theta));
-                var ct1 = Math.cos(toRadians(theta + inc_theta));
+              for (let theta = 0; theta < 180; theta += inc_theta) {
+                let st = Math.sin(toRadians(theta));
+                let ct = Math.cos(toRadians(theta));
+                let st1 = Math.sin(toRadians(theta + inc_theta));
+                let ct1 = Math.cos(toRadians(theta + inc_theta));
                 vertices.push(radio * st * sp);
                 vertices.push(radio * ct);
                 vertices.push(radio * st * cp);
@@ -336,7 +333,7 @@
              *     |     \ |
              *    1 ------- 2  
              */ 
-            for (var k = 0, j = 0; k < this.cantidadDeIndices; k += 6, j += 4) {
+            for (let k = 0, j = 0; k < this.cantidadDeIndices; k += 6, j += 4) {
               indices.push(j);
               indices.push(j + 1);
               indices.push(j + 2);
@@ -345,67 +342,67 @@
               indices.push(j + 3);
             }
 
-            /* Se crea el objeto del arreglo de vértices (VAO) */
+            /* Se crea el objeto del arreglo de vÃ©rtices (VAO) */
             this.esferaVAO = gl.createVertexArray();
 
             /* Se activa el objeto */
             gl.bindVertexArray(this.esferaVAO);
 
 
-            /* Se genera un nombre (código) para el buffer */ 
-            var verticeBuffer = gl.createBuffer();
+            /* Se genera un nombre (cÃ³digo) para el buffer */ 
+            let verticeBuffer = gl.createBuffer();
 
-            /* Se asigna un nombre (código) al buffer */
+            /* Se asigna un nombre (cÃ³digo) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, verticeBuffer);
          
             /* Se transfiere los datos desde la memoria nativa al buffer de la GPU */
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-            /* Se habilita el arreglo de los vértices (indice = 0) */
+            /* Se habilita el arreglo de los vÃ©rtices (indice = 0) */
             gl.enableVertexAttribArray(0);
 
-            /* Se especifica el arreglo de vértices */
+            /* Se especifica el arreglo de vÃ©rtices */
             gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
 
-            /* Se genera un nombre (código) para el buffer */
-            var indiceBuffer = gl.createBuffer();
+            /* Se genera un nombre (cÃ³digo) para el buffer */
+            let indiceBuffer = gl.createBuffer();
 
-            /* Se asigna un nombre (código) al buffer */
+            /* Se asigna un nombre (cÃ³digo) al buffer */
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
 
             /* Se transfiere los datos desde la memoria nativa al buffer de la GPU */
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
 
-            /* Se desactiva el objeto del arreglo de vértices */
+            /* Se desactiva el objeto del arreglo de vÃ©rtices */
             gl.bindVertexArray(null);
 
-            /* Se deja de asignar un nombre (código) al buffer */
+            /* Se deja de asignar un nombre (cÃ³digo) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-            /* Se deja de asignar un nombre (código) al buffer */
+            /* Se deja de asignar un nombre (cÃ³digo) al buffer */
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
           }
 
           dibuja(gl) {
 
-            /* Se activa el objeto del arreglo de vértices */
+            /* Se activa el objeto del arreglo de vÃ©rtices */
             gl.bindVertexArray(this.esferaVAO);
 
-            /* Renderiza las primitivas desde los datos de los arreglos (vértices,
+            /* Renderiza las primitivas desde los datos de los arreglos (vÃ©rtices,
              * normales e indices) */
             gl.drawElements(gl.LINES, this.cantidadDeIndices, gl.UNSIGNED_SHORT, 0);
 
-            /* Se desactiva el objeto del arreglo de vértices */
+            /* Se desactiva el objeto del arreglo de vÃ©rtices */
             gl.bindVertexArray(null);
 
           }
         }
 
         /***************************************************************************/
-        /* Funciones de adición y eliminación de los puntos                        */
+        /* Funciones de adiciÃ³n y eliminaciÃ³n de los puntos                        */
         /***************************************************************************/
 
         /* Activa el simple paso */
@@ -423,10 +420,10 @@
             case 83: // 's'
               opcion_simple_paso();
               break;
-            case 38: // Tecla arriba (Duplica el tiempo de la animación)
+            case 38: // Tecla arriba (Duplica el tiempo de la animaciÃ³n)
               tiempoDeLaAnimacion *= 2.0;
               break;
-            case 40: // Tecla abajo  (Reduce a la mitad el tiempo de la animación)
+            case 40: // Tecla abajo  (Reduce a la mitad el tiempo de la animaciÃ³n)
               tiempoDeLaAnimacion /= 2.0;
               break;
             case 27: // Tecla abajo
@@ -457,20 +454,20 @@
 
           gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
-          // Dibuja el sol -- de amarillo, la esfera está en base a líneas.
+          // Dibuja el sol -- de amarillo, la esfera estÃ¡ en base a lÃ­neas.
           gl.uniform4f(uColor, 1, 1, 0, 1);
           sol.dibuja(gl);
 
           // Dibuja la tierra
           // Primero se ubica al rededor del sol
-          //      Se usa diasPorAnio para determinar su posición.
+          //      Se usa diasPorAnio para determinar su posiciÃ³n.
           rotacionY(MatrizModelo, 360.0*diasPorAnio/365.0);
           traslacion(MatrizModelo, 4.0, 0.0, 0.0);
 
           _MatrizModelo = MatrizModelo.slice(); /* Copia */
 
           // Segundo, se rota la tierra sobre su eje.
-          //      Se usa horasPorDia para determinar su rotación.
+          //      Se usa horasPorDia para determinar su rotaciÃ³n.
           rotacionY(MatrizModelo, 360.0*horasPorDia/24.0);
           gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
           // Tercero, se dibuja la tierra como una esfera en base a lineas.
@@ -480,7 +477,7 @@
           MatrizModelo = _MatrizModelo.slice(); /* Copia */
 
           // Dibuja la luna.
-          //  Se usa diasPorAnio para controlar su rotación alrededor de la Tierra.
+          //  Se usa diasPorAnio para controlar su rotaciÃ³n alrededor de la Tierra.
           rotacionY(MatrizModelo, 360.0 * 12.0 * diasPorAnio / 365.0);
           traslacion(MatrizModelo, 0.7, 0.0, 0.0);
           gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
@@ -489,17 +486,17 @@
           luna.dibuja(gl);
 
           /* Obtiene el tiempo real*/
-          var fin = Date.now(); // Tiempo Final
-          var duracion = fin - inicio;
+          let fin = Date.now(); // Tiempo Final
+          let duracion = fin - inicio;
           tiempo_real = duracion / 1000.0;
           inicio = fin;
 
-          /* Incrementa y verifica el límite del tiempo */
+          /* Incrementa y verifica el lÃ­mite del tiempo */
           tiempoRotacion = tiempoRotacion - tiempo_real;
           if (tiempoRotacion < 0.001) { 
             tiempoRotacion = PERIODO_DE_LA_ROTACION;
             if (animacion) {
-              // Actualiza el estado de la animación
+              // Actualiza el estado de la animaciÃ³n
               horasPorDia += tiempoDeLaAnimacion;
               diasPorAnio += tiempoDeLaAnimacion/24.0;
 
@@ -517,14 +514,14 @@
 
         }
 
-        /* Activa y desactiva la animación */
+        /* Activa y desactiva la animaciÃ³n */
         function animacionCheckbox() {
-          var r = document.getElementById("animacion").checked
+          let r = document.getElementById("animacion").checked
           if (simplePaso) { // Si 
             simplePaso = false;  // Finaliza modo de simple paso
-            animacion = true;    // Restaura la animación
+            animacion = true;    // Restaura la animaciÃ³n
           } else {
-            animacion = !animacion; // Activa y desactiva la animación.
+            animacion = !animacion; // Activa y desactiva la animaciÃ³n.
           }
         }
 
@@ -536,14 +533,14 @@
 
           gl = canvas.getContext("webgl2");
           if (!gl) {
-             document.write("WebGL 2.0 no está disponible en tu navegador");
+             document.write("WebGL 2.0 no estÃ¡ disponible en tu navegador");
              return;
           }
 
-          /* Se indica a la aplicación que detecte los eventos del teclado */
+          /* Se indica a la aplicaciÃ³n que detecte los eventos del teclado */
           document.addEventListener("keydown", keyDown, true);
 
-          /* Para las casillas de verificación */
+          /* Para las casillas de verificaciÃ³n */
           document.getElementById("animacion").checked = true;
           document.getElementById("animacion").onchange = animacionCheckbox;
 
@@ -567,7 +564,7 @@
           uMatrizProyeccion = gl.getUniformLocation(programaID, "uMatrizProyeccion");
           uMatrizModelo = gl.getUniformLocation(programaID, "uMatrizModelo");
 
-          /* Matriz de Proyección */
+          /* Matriz de ProyecciÃ³n */
           perspective(MatrizProyeccion, 80, 1, 1, 30);
           gl.uniformMatrix4fv(uMatrizProyeccion, false, MatrizProyeccion);
 
@@ -583,7 +580,7 @@
           dibuja();
         }
 
-        /* Llama a main una vez que la página web se haya cargado. */
+        /* Llama a main una vez que la pÃ¡gina web se haya cargado. */
         window.onload = main;
 
       </script>
