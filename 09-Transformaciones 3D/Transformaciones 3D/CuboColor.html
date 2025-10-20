@@ -1,25 +1,33 @@
 ﻿<!DOCTYPE HTML>
 <html>
 <head>
+  <style type="text/css">
+    #canvas-holder {
+      float:left;
+      margin-right:10px;
+    }
+    #opciones {
+      float:left;
+      background-color:white;
+      margin-top: 50pt;
+      padding: 8px
+    }
+  </style>  
   <title>Cubo Color en WebGL 2.0</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
-   <body>
-      <div id="content">
-
-      <h2>Cubo Color en WebGL 2.0</h2>
-
-      <div id="tools">
+<body>
+  <div id="content">
+    <h2>Cubo Color en WebGL 2.0</h2>
+    <div id="canvas-holder">
+      <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+    </div>
+    <div id="opciones">
+      <fieldset>
         <p><label><input type="checkbox" id="animacion"> <b>Animación</b></label></p>
-        <p><label><input type="checkbox" id="ocultamientoDeSuperficies"> Habilita el Buffer de Profundidad (DEPTH_TEST)</label></p>
-        <p><label><input type="checkbox" id="bufferDeProfundidad"> Limpia el Buffer de Profundidad (DEPTH_BUFFER)</label></p>
-      </div>
-
-      <div id="canvas-holder">
-        <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
-      </div>
-
-      </div>
+      </fieldset>
+    </div>
+  </div>
 
       <!--
         /***************************************************************************/
@@ -54,37 +62,37 @@
         "use strict";
 
         /* Variables globales */
-        var gl;
-        var programaID;
-        var cubo;
+        let gl;
+        let programaID;
+        let cubo;
 
         /* Variables Uniformes */
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /* Incremento del ángulo de la animación */
-        var rotX = 0;
-        var rotY = 0;
-        var rotZ = 0;
+        let rotX = 0;
+        let rotY = 0;
+        let rotZ = 0;
         const INCX = 0.3;
         const INCY = 0.2;
         const INCZ = 0.4;
-        var incX = 0;
-        var incY = 0;
-        var incZ = 0;
+        let incX = INCX;
+        let incY = INCY;
+        let incZ = INCZ;
 
-        var animacion = false;
+        let animacion = true;
 
-        var tiempo_real, fin, duracion;
-        var inicio = Date.now(); // Tiempo Inicial
+        let tiempo_real, fin, duracion;
+        let inicio = Date.now(); // Tiempo Inicial
         const PERIODO_MOVIMIENTO = 0.01; // 1/60 = 0.0167 (60 cuadros por seg.)
-        var tiempoMovimiento = PERIODO_MOVIMIENTO;
+        let tiempoMovimiento = PERIODO_MOVIMIENTO;
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -92,7 +100,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -100,7 +108,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -139,7 +147,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -149,7 +157,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -160,8 +168,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -172,8 +180,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -184,8 +192,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -211,8 +219,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -255,7 +263,7 @@
              */
 
             /* Las coordenadas cartesianas (x, y, z) */
-            var vertices = [
+            let vertices = [
                // Frente
                -1, -1,  1, // 4   0
                 1, -1,  1, // 5   1
@@ -289,7 +297,7 @@
             ];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [
+            let colores = [
                // Frente - lila
                 1, 0, 1, 1, // 4   0
                 1, 0, 1, 1, // 5   1
@@ -323,7 +331,7 @@
             ];
 
             /* Indices */
-            var indices = [ 
+            let indices = [ 
               0,  1,  2,  0,  2,  3, // Frente
               4,  5,  6,  4,  6,  7, // Atrás
               8,  9, 10,  8, 10, 11, // Izquierda 
@@ -340,7 +348,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
@@ -356,7 +364,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */ 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
@@ -372,7 +380,7 @@
 
 
             /* Se genera un nombre (código) para el buffer */
-            var codigoDeIndices = gl.createBuffer();
+            let codigoDeIndices = gl.createBuffer();
 
             /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, codigoDeIndices);
@@ -411,22 +419,8 @@
         /* Se renderizan todos los objetos                                         */
         /***************************************************************************/
         function dibuja() {
-
-          if (document.getElementById("bufferDeProfundidad").checked) {
-            /* Inicializa el buffer de color y de profundidad */
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-          } else {
-            /* Inicializa el buffer de color */
-            gl.clear(gl.COLOR_BUFFER_BIT);
-          }
-
-          if (document.getElementById("ocultamientoDeSuperficies").checked) {
-            /* Habilita el ocultamiento de superficies */
-            gl.enable(gl.DEPTH_TEST);
-          } else {
-            /* Deshabilita el ocultamiento de superficies */
-            gl.disable(gl.DEPTH_TEST);
-          }
+          /* Inicializa el buffer de color y de profundidad */
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
           /* Matriz del Modelo */
           identidad(MatrizModelo);
@@ -459,7 +453,7 @@
         }
 
         function animacionCheckbox() {
-          var r = document.getElementById("animacion").checked
+          let r = document.getElementById("animacion").checked
           if (r != animacion) {
             animacion = r;
             incX = incX == 0 ? INCY : 0;
@@ -472,7 +466,7 @@
         function main() {
 
           /* Paso 1: Se prepara el lienzo y se obtiene el contexto del WebGL.        */
-          var canvas = document.getElementById("webglcanvas");
+          let canvas = document.getElementById("webglcanvas");
 
           gl = canvas.getContext("webgl2");
           if (!gl) {
@@ -481,12 +475,8 @@
           }
 
           /* Para las casillas de verificación */
-          document.getElementById("animacion").checked = false;
+          document.getElementById("animacion").checked = true;
           document.getElementById("animacion").onchange = animacionCheckbox;
-          document.getElementById("ocultamientoDeSuperficies").checked = true;
-          document.getElementById("ocultamientoDeSuperficies").onchange = dibuja;
-          document.getElementById("bufferDeProfundidad").checked = true;
-          document.getElementById("bufferDeProfundidad").onchange = dibuja;
 
           // Se define la ventana de despliegue
           gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -512,6 +502,9 @@
           gl.uniformMatrix4fv(uMatrizVista, false, MatrizVista);
 
           /* Paso 5: Se renderizan los objetos                                       */
+
+          // Habilita el ocultamiento de superficies
+          gl.enable(gl.DEPTH_TEST);
 
           // Color de fondo
           gl.clearColor(0.0, 0.0, 0.0, 1.0);

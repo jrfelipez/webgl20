@@ -13,19 +13,21 @@
       padding: 8px
     }
   </style>  
-  <title>Cubo Color Interacción en WebGL 2.0</title>
+  <title>Buffer de Profundidad en WebGL 2.0</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
 <body>
   <div id="content">
-    <h2>Cubo Color Interacción en WebGL 2.0</h2>
+    <h2>Buffer de Profundidad en WebGL 2.0</h2>
     <div id="canvas-holder">
       <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
     </div>
     <div id="opciones">
       <fieldset>
-        <p><button id="reset">Reinicia</button></p>
-      </fieldset>
+        <legend>Habilita y Limpia: </legend>      
+        <p><label><input type="checkbox" id="ocultamientoDeSuperficies"> Habilita el Buffer de Profundidad (DEPTH_TEST)</label></p>
+        <p><label><input type="checkbox" id="bufferDeProfundidad"> Limpia el Buffer de Profundidad (DEPTH_BUFFER)</label></p>
+    </fieldset>
     </div>
   </div>
 
@@ -62,10 +64,9 @@
         "use strict";
 
         /* Variables globales */
-        let canvas;
-        let programaID;
         let gl;
-        let cubo;
+        let programaID;
+        let triangulos;
 
         /* Variables Uniformes */
         let uMatrizProyeccion;
@@ -76,13 +77,6 @@
         let MatrizProyeccion = new Array(16);
         let MatrizVista = new Array(16);
         let MatrizModelo = new Array(16);
-
-        /* Para la interacción */
-        let rotX = 0;
-        let rotY = 0;
-        let antX;
-        let antY;
-        let boton_izq_presionado = false;
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -236,249 +230,193 @@
         /***********************************************************************************/
         /* Se define la geometría y se almacenan en los buffers de memoria y se renderiza. */
         /***********************************************************************************/
-        class Cubo {
+        class Triangulos {
           constructor(gl) {
-
-            /**
-             *       3 --------- 2
-             *       /|        /|   
-             *      / |       / |
-             *    7 --------- 6 |
-             *     |  |      |  |
-             *     | 0 ------|-- 1 
-             *     | /       | /
-             *     |/        |/
-             *    4 --------- 5  
-             */
 
             /* Las coordenadas cartesianas (x, y, z) */
             let vertices = [
-               // Frente
-               -1, -1,  1, // 4   0
-                1, -1,  1, // 5   1
-                1,  1,  1, // 6   2
-               -1,  1,  1, // 7   3
-               // Atrás
-               -1,  1, -1, // 3   4
-                1,  1, -1, // 2   5
-                1, -1, -1, // 1   6
-               -1, -1, -1, // 0   7
-               // Izquierda
-               -1, -1, -1, // 0   8
-               -1, -1,  1, // 4   9
-               -1,  1,  1, // 7  10 
-               -1,  1, -1, // 3  11
-               // Derecha
-                1, -1,  1, // 5  12 
-                1, -1, -1, // 1  13
-                1,  1, -1, // 2  14
-                1,  1,  1, // 6  15
-               // Abajo
-               -1, -1, -1, // 0  16
-                1, -1, -1, // 1  17
-                1, -1,  1, // 5  18
-               -1, -1,  1, // 4  19
-               // Arriba
-               -1,  1,  1, // 7  20
-                1,  1,  1, // 6  21
-                1,  1, -1, // 2  22
-               -1,  1, -1  // 3  23
+               // Triangulo 1
+                 0.0,  1.0, -6.0, // 0
+                -0.5, -1.0, -6.0, // 1
+                 0.5, -1.0, -6.0, // 2
+               // Triangulo 2
+                 0.0,  1.0, -8.0, // 3
+                -0.5, -1.0, -8.0, // 4
+                 0.5, -1.0, -8.0, // 5
+               // Triangulo 3
+                 0.0,  1.0, -10.0, // 6
+                -0.5, -1.0, -10.0, // 7
+                 0.5, -1.0, -10.0, // 8
             ];
 
             /* Los colores x c/vértice (r,g,b,a) */
             let colores = [
-               // Frente - lila
-                1, 0, 1, 1, // 4   0
-                1, 0, 1, 1, // 5   1
-                1, 0, 1, 1, // 6   2
-                1, 0, 1, 1, // 7   3	
-               // Atrás - amarillo
-                1, 1, 0, 1, // 3   4	
-                1, 1, 0, 1, // 2   5
-                1, 1, 0, 1, // 1   6	
-                1, 1, 0, 1, // 0   7	
-               // Izquierda - celeste
-                0, 1, 1, 1, // 0   8
-                0, 1, 1, 1, // 4   9
-                0, 1, 1, 1, // 7  10
-                0, 1, 1, 1, // 3  11
-               // Derecha - rojo
-                1, 0, 0, 1, // 5  12
-                1, 0, 0, 1, // 1  13
-                1, 0, 0, 1, // 2  14
-                1, 0, 0, 1, // 6  15
-               // Abajo - azul
-                0, 0, 1, 1, // 0  16
-                0, 0, 1, 1, // 1  17
-                0, 0, 1, 1, // 5  18
-                0, 0, 1, 1, // 4  19
-               // Arriba - verde
-                0, 1, 0, 1, // 7  20
-                0, 1, 0, 1, // 6  21
-                0, 1, 0, 1, // 2  22
-                0, 1, 0, 1  // 3  23
+               // Triangulo lila
+                0.4,  0.4,  1.0, 1, // 0
+                0.4,  0.4,  1.0, 1, // 1
+                1.0,  0.4,  0.4, 1, // 2
+               // Triangulo amarillo
+                1.0,  1.0,  0.4, 1, // 3
+                1.0,  1.0,  0.4, 1, // 4
+                1.0,  0.4,  0.4, 1, // 5
+               // Triangulo verde
+                0.4,  1.0,  0.4, 1, // 6
+                0.4,  1.0,  0.4, 1, // 7
+                1.0,  0.4,  0.4, 1, // 8                
             ];
 
-            /* Indices */
-            let indices = [ 
-              0,  1,  2,  0,  2,  3, // Frente
-              4,  5,  6,  4,  6,  7, // Atrás
-              8,  9, 10,  8, 10, 11, // Izquierda 
-             12, 13, 14, 12, 14, 15, // Derecha
-             16, 17, 18, 16, 18, 19, // Abajo
-             20, 21, 22, 20, 22, 23  // Arriba
-            ];
-
+            /* Se crea el objeto del arreglo de vértices (VAO) */
             this.cuboVAO = gl.createVertexArray();
+
+            /* Se activa el objeto */
             gl.bindVertexArray(this.cuboVAO);
 
+            /* Se genera un nombre (código) para el buffer */ 
             let codigoVertices = gl.createBuffer();
+
+            /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
+         
+            /* Se transfiere los datos desde la memoria nativa al buffer de la GPU */
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+            /* Se habilita el arreglo de los vértices (indice = 0) */
             gl.enableVertexAttribArray(0);
+
+            /* Se especifica el arreglo de vértices */
             gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
+
+            /* Se genera un nombre (código) para el buffer */ 
             let codigoColores = gl.createBuffer();
+
+            /* Se asigna un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
+         
+            /* Se transfiere los datos desde la memoria nativa al buffer de la GPU */
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colores), gl.STATIC_DRAW);
+
+            /* Se habilita el arreglo de los colores (indice = 1) */
             gl.enableVertexAttribArray(1);
+
+            /* Se especifica el arreglo de colores */
             gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 0, 0);
 
-            let codigoDeIndices = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, codigoDeIndices);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
+            /* Se desactiva el objeto del arreglo de vértices */
             gl.bindVertexArray(null);
+
+            /* Se deja de asignar un nombre (código) al buffer */
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           }
 
           dibuja(gl) {
+
+            /* Se activa el objeto del arreglo de vértices */
             gl.bindVertexArray(this.cuboVAO);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+
+            /* Se renderiza las primitivas desde los datos del arreglo */
+            gl.drawArrays(gl.TRIANGLES, 0, 9);
+
+            /* Se desactiva el objeto del arreglo de vértices */
             gl.bindVertexArray(null);
+
           }
         }
+
+        /***************************************************************************/
+        /* Se renderizan todos los objetos                                         */
+        /***************************************************************************/
         function dibuja() {
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+          if (document.getElementById("bufferDeProfundidad").checked) {
+            /* Inicializa el buffer de color y de profundidad */
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          } else {
+            /* Inicializa el buffer de color */
+            gl.clear(gl.COLOR_BUFFER_BIT);
+          }
+
+          if (document.getElementById("ocultamientoDeSuperficies").checked) {
+            /* Habilita el ocultamiento de superficies */
+            gl.enable(gl.DEPTH_TEST);
+          } else {
+            /* Deshabilita el ocultamiento de superficies */
+            gl.disable(gl.DEPTH_TEST);
+          }
 
           /* Matriz del Modelo */
           identidad(MatrizModelo);
-          rotacionY(MatrizModelo, rotX);
-          rotacionX(MatrizModelo, rotY);
-          escalacion(MatrizModelo, 2, 2, 2);
+          traslacion(MatrizModelo, -0.75, 0, 0);
           gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
 
-          cubo.dibuja(gl);
+          /* Renderiza */
+          triangulos.dibuja(gl);
 
+          /* Matriz del Modelo */
+          identidad(MatrizModelo);
+          traslacion(MatrizModelo,  0.75, 0, 0);
+          gl.uniformMatrix4fv(uMatrizModelo, false, MatrizModelo);
+
+          /* Renderiza */
+          triangulos.dibuja(gl);
+
+          /* Solicita que el navegador llame nuevamente a dibuja */
           requestAnimationFrame(dibuja);
-        }
 
-        /***************************************************************************/
-        /* Eventos del Ratón                                                       */
-        /***************************************************************************/
-
-        function mouseDown(event) {
-          let posx = new Number();
-          let posy = new Number();
-
-          /* Obtiene la coordenada dentro de la área mayor */
-          if (event.x != undefined && event.y != undefined) {
-            posx = event.x;
-            posy = event.y;
-          } else {
-            posx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-            posy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-          }
-
-          /* Obtiene la coordenada dentro del canvas */
-          posx = posx - canvas.offsetLeft;
-          posy = posy - canvas.offsetTop;
-
-          antX = posx;
-          antY = posy;
-
-          boton_izq_presionado = true;
-
-          return false;
-        };
-
-        function mouseUp(e){
-          boton_izq_presionado = false;
-        };
-
-        function mouseMove(event) {
-
-          if (!boton_izq_presionado)
-            return false;
-
-          let posx = new Number();
-          let posy = new Number();
-
-          /* Obtiene la coordenada dentro de la área mayor */
-          if (event.x != undefined && event.y != undefined) {
-            posx = event.x;
-            posy = event.y;
-          } else {
-            posx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-            posy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-          }
-
-          /* Obtiene la coordenada dentro del canvas */
-          posx = posx - canvas.offsetLeft;
-          posy = posy - canvas.offsetTop;
-
-          let dx = posx - antX;
-          let dy = posy - antY;
-
-          rotX = rotX + dx * 0.36; // 180 / 500 = 0.36
-          rotY = rotY + dy * 0.36;
-
-          antX = posx;
-          antY = posy;
-
-        };
-
-        function reinicia() {
-          rotX = rotY = 0;
-          dibuja();
         }
 
         function main() {
-          canvas = document.getElementById("webglcanvas");
+
+          /* Paso 1: Se prepara el lienzo y se obtiene el contexto del WebGL.        */
+          let canvas = document.getElementById("webglcanvas");
+
           gl = canvas.getContext("webgl2");
           if (!gl) {
              document.write("WebGL 2.0 no está disponible en tu navegador");
              return;
           }
 
-          /* Para detectar los eventos del ratón */
-          canvas.addEventListener("mousedown", mouseDown, false);
-          canvas.addEventListener("mouseup", mouseUp, false);
-          canvas.addEventListener("mouseout", mouseUp, false);
-          canvas.addEventListener("mousemove", mouseMove, false);
+          /* Para las casillas de verificación */
+          document.getElementById("ocultamientoDeSuperficies").checked = true;
+          document.getElementById("ocultamientoDeSuperficies").onchange = dibuja;
+          document.getElementById("bufferDeProfundidad").checked = true;
+          document.getElementById("bufferDeProfundidad").onchange = dibuja;
 
-          /* Para los botones */
-          document.getElementById("reset").onclick = reinicia;
-
+          // Se define la ventana de despliegue
           gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+          /* Paso 2: Se crean, compilan y enlazan los programas Shader               */
           compilaEnlazaLosShaders();
 
-          cubo = new Cubo(gl);
+          /* Paso 3: Se define la geometría y se almacenan en los buffers de memoria.*/
+          triangulos = new Triangulos(gl);
 
+          /* Paso 4: Se obtiene los ID de las variables de entrada de los shaders    */
           gl.useProgram(programaID);
           uMatrizProyeccion = gl.getUniformLocation(programaID, "uMatrizProyeccion");
           uMatrizVista = gl.getUniformLocation(programaID, "uMatrizVista");
           uMatrizModelo = gl.getUniformLocation(programaID, "uMatrizModelo");
-          ortho(MatrizProyeccion, -5, 5, -5, 5, -5, 5);
+
+          /* Matriz de Proyección */
+          perspective(MatrizProyeccion, 30, canvas.width/canvas.height, 2, 100);
           gl.uniformMatrix4fv(uMatrizProyeccion, false, MatrizProyeccion);
+
+          /* Matriz de Vista */
           identidad(MatrizVista);
           gl.uniformMatrix4fv(uMatrizVista, false, MatrizVista);
-          gl.enable(gl.DEPTH_TEST);
+
+          /* Paso 5: Se renderizan los objetos                                       */
+
+          // Color de fondo
           gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
           dibuja();
         }
+
+        /* Llama a main una vez que la página web se haya cargado. */
         window.onload = main;
+
       </script>
    </body>
 </html>
