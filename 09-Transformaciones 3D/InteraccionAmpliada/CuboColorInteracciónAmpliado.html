@@ -1,23 +1,33 @@
 ﻿<!DOCTYPE HTML>
 <html>
 <head>
+  <style type="text/css">
+    #canvas-holder {
+      float:left;
+      margin-right:10px;
+    }
+    #opciones {
+      float:left;
+      background-color:white;
+      margin-top: 50pt;
+      padding: 8px
+    }
+  </style>  
   <title>Cubo Color Interacción en WebGL 2.0</title>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
-   <body>
-      <div id="content">
-
-      <h2>Cubo Color Interacción en WebGL 2.0</h2>
-
-      <div id="tools">
+<body>
+  <div id="content">
+    <h2>Cubo Color Interacción en WebGL 2.0</h2>
+    <div id="canvas-holder">
+      <canvas id="webglcanvas" style="border: none;" width="500" height="500"></canvas>
+    </div>
+    <div id="opciones">
+      <fieldset>
         <p><button id="reset">Reinicia</button></p>
-      </div>
-
-      <div id="canvas-holder">
-      <canvas id="webglcanvas" style="border: none;" width="500" height="500" oncontextmenu="return false;"></canvas>
-      </div>
-
-      </div>
+      </fieldset>
+    </div>
+  </div>  
 
       <!--
         /***************************************************************************/
@@ -52,28 +62,28 @@
         "use strict";
 
         /* Variables globales */
-        var canvas;
-        var programaID;
-        var gl;
-        var cubo;
+        let canvas;
+        let programaID;
+        let gl;
+        let cubo;
 
         /* Variables Uniformes */
-        var uMatrizProyeccion;
-        var uMatrizVista;
-        var uMatrizModelo;
+        let uMatrizProyeccion;
+        let uMatrizVista;
+        let uMatrizModelo;
 
         /* Matrices */
-        var MatrizProyeccion = new Array(16);
-        var MatrizVista = new Array(16);
-        var MatrizModelo = new Array(16);
+        let MatrizProyeccion = new Array(16);
+        let MatrizVista = new Array(16);
+        let MatrizModelo = new Array(16);
 
         /* Para la interacción */
-        var tx = 0, ty = 0;
-        var sx = 1, sy = 1, sz = 1;
-        var rotX = 0, rotY = 0;
-        var antX, antY;
-        var boton_izq_presionado = false;
-        var boton_der_presionado = false;
+        let tx = 0, ty = 0;
+        let sx = 1, sy = 1, sz = 1;
+        let rotX = 0, rotY = 0;
+        let antX, antY;
+        let boton_izq_presionado = false;
+        let boton_der_presionado = false;
 
         /***************************************************************************/
         /* Se crean, compilan y enlazan los programas Shader                       */
@@ -81,7 +91,7 @@
         function compilaEnlazaLosShaders() {
 
           /* Se compila el shader de vertice */
-          var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+          let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
           gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
           gl.compileShader(shaderDeVertice);
           if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -89,7 +99,7 @@
           }
 
           /* Se compila el shader de fragmento */
-          var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+          let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
           gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
           gl.compileShader(shaderDeFragmento);
           if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -128,7 +138,7 @@
 
         /* Traslación - glTranslatef */
         function traslacion(matriz, tx, ty, tz) {
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
           r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
           r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -138,7 +148,7 @@
 
         /* Escalación - glScalef */
         function escalacion(matriz, sx, sy, sz) { 
-          var r = new Array(16);
+          let r = new Array(16);
           r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
           r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
           r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -149,8 +159,8 @@
         /* Rotación sobre X - glRotatef */
         function rotacionX(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
           r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
           r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -161,8 +171,8 @@
         /* Rotación sobre Y - glRotatef */
         function rotacionY(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
           r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
           r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -173,8 +183,8 @@
         /* Rotación sobre Z - glRotatef */
         function rotacionZ(matriz, theta){
           let r = new Array(16);
-          var c = Math.cos(toRadians(theta));
-          var s = Math.sin(toRadians(theta));
+          let c = Math.cos(toRadians(theta));
+          let s = Math.sin(toRadians(theta));
           r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
           r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
           r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -200,8 +210,8 @@
 
         /* Proyección Perspectiva - gluPerspective */
         function perspective(r, fovy, aspecto, cerca, lejos) {
-          var ang = fovy * 0.5;
-          var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+          let ang = fovy * 0.5;
+          let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
           r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
           r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
           r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -243,7 +253,7 @@
              */
 
             /* Las coordenadas cartesianas (x, y, z) */
-            var vertices = [
+            let vertices = [
                // Frente
                -1, -1,  1, // 4   0
                 1, -1,  1, // 5   1
@@ -277,7 +287,7 @@
             ];
 
             /* Los colores x c/vértice (r,g,b,a) */
-            var colores = [
+            let colores = [
                // Frente - lila
                 1, 0, 1, 1, // 4   0
                 1, 0, 1, 1, // 5   1
@@ -311,7 +321,7 @@
             ];
 
             /* Indices */
-            var indices = [ 
+            let indices = [ 
               0,  1,  2,  0,  2,  3, // Frente
               4,  5,  6,  4,  6,  7, // Atrás
               8,  9, 10,  8, 10, 11, // Izquierda 
@@ -323,19 +333,19 @@
             this.cuboVAO = gl.createVertexArray();
             gl.bindVertexArray(this.cuboVAO);
 
-            var codigoVertices = gl.createBuffer();
+            let codigoVertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoVertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
-            var codigoColores = gl.createBuffer();
+            let codigoColores = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, codigoColores);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colores), gl.STATIC_DRAW);
             gl.enableVertexAttribArray(1);
             gl.vertexAttribPointer(1, 4, gl.FLOAT, false, 0, 0);
 
-            var codigoDeIndices = gl.createBuffer();
+            let codigoDeIndices = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, codigoDeIndices);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
@@ -356,8 +366,8 @@
         /***************************************************************************/
 
         function mouseDown(event) {
-          var posx = new Number();
-          var posy = new Number();
+          let posx = new Number();
+          let posy = new Number();
 
           /* Obtiene la coordenada dentro de la área mayor */
           if (event.x != undefined && event.y != undefined) {
@@ -389,8 +399,8 @@
         };
 
         function mouseMove(event) {
-          var posx = new Number();
-          var posy = new Number();
+          let posx = new Number();
+          let posy = new Number();
 
           /* Obtiene la coordenada dentro de la área mayor */
           if (event.x != undefined && event.y != undefined) {
@@ -405,8 +415,8 @@
           posx = posx - canvas.offsetLeft;
           posy = posy - canvas.offsetTop;
 
-          var dx = posx - antX;
-          var dy = posy - antY;
+          let dx = posx - antX;
+          let dy = posy - antY;
 
           if (boton_izq_presionado) {
             rotX = rotX + dx * 0.36; // 180 / 500 = 0.36
