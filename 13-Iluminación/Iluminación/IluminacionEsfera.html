@@ -118,35 +118,35 @@
       "use strict";
 
       /* Variables globales */
-      var canvas;
-      var programaID;
-      var gl;
-      var esfera;
+      let canvas;
+      let programaID;
+      let gl;
+      let esfera;
 
       /* Variables Uniformes */
-      var uMatrizProyeccion;
-      var uMatrizVista;
-      var uMatrizModelo;
-      var uPosicionVista;
-      var uPosicionLuz;
-      var u_Ia;
-      var u_Id;
-      var u_Is;
-      var u_ka;
-      var u_kd;
-      var u_ks;
-      var u_brillo;
+      let uMatrizProyeccion;
+      let uMatrizVista;
+      let uMatrizModelo;
+      let uPosicionVista;
+      let uPosicionLuz;
+      let u_Ia;
+      let u_Id;
+      let u_Is;
+      let u_ka;
+      let u_kd;
+      let u_ks;
+      let u_brillo;
 
       /* Matrices */
-      var MatrizProyeccion = new Array(16);
-      var MatrizVista = new Array(16);
-      var MatrizModelo = new Array(16);
+      let MatrizProyeccion = new Array(16);
+      let MatrizVista = new Array(16);
+      let MatrizModelo = new Array(16);
 
       /* Ubicación de la vista */
-      var posicionVista = [0, 0, 0];
+      let posicionVista = [0, 0, 0];
 
       /* Ubicación de la luz */
-      var posicionLuz = [3, 3, -2];
+      let posicionLuz = [3, 3, -2];
 
       /***************************************************************************/
       /* Se crean, compilan y enlazan los programas Shader                       */
@@ -154,7 +154,7 @@
       function compilaEnlazaLosShaders() {
 
         /* Se compila el shader de vertice */
-        var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+        let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
         gl.compileShader(shaderDeVertice);
         if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -162,7 +162,7 @@
         }
 
         /* Se compila el shader de fragmento */
-        var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+        let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
         gl.compileShader(shaderDeFragmento);
         if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -201,7 +201,7 @@
 
       /* Traslación - glTranslatef */
       function traslacion(matriz, tx, ty, tz) {
-        var r = new Array(16);
+        let r = new Array(16);
         r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
         r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
         r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -211,7 +211,7 @@
 
       /* Escalación - glScalef */
       function escalacion(matriz, sx, sy, sz) { 
-        var r = new Array(16);
+        let r = new Array(16);
         r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
         r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
         r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -222,8 +222,8 @@
       /* Rotación sobre X - glRotatef */
       function rotacionX(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
         r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
         r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -234,8 +234,8 @@
       /* Rotación sobre Y - glRotatef */
       function rotacionY(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
         r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
         r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -246,8 +246,8 @@
       /* Rotación sobre Z - glRotatef */
       function rotacionZ(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
         r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
         r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -273,8 +273,8 @@
 
       /* Proyección Perspectiva - gluPerspective */
       function perspective(r, fovy, aspecto, cerca, lejos) {
-        var ang = fovy * 0.5;
-        var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+        let ang = fovy * 0.5;
+        let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
         r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
         r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
         r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -301,24 +301,24 @@
       function lookAt(r, vistaX, vistaY, vistaZ, centroX,
         centroY, centroZ, arribaX, arribaY, arribaZ) {
 
-        var vista = new Vector3(vistaX, vistaY, vistaZ);
-        var centro = new Vector3(centroX, centroY, centroZ);
-        var arriba = new Vector3(arribaX, arribaY, arribaZ);
+        let vista = new Vector3(vistaX, vistaY, vistaZ);
+        let centro = new Vector3(centroX, centroY, centroZ);
+        let arriba = new Vector3(arribaX, arribaY, arribaZ);
     
         /* n = vista - centro */
-        var n = vista.menos(centro);
+        let n = vista.menos(centro);
 
         /* u = u / || u || */
         n.normaliza();
   
         /* v = arriba */
-        var v = arriba;
+        let v = arriba;
 
         /* v = v / || v || */
         //v.normaliza(); // No es necesario!
 
         /* u = v x n */
-        var u = v.producto_vectorial(n);
+        let u = v.producto_vectorial(n);
   
         /* u = u / || u || */
         u.normaliza();
@@ -346,15 +346,15 @@
         r[0] = a[0] * b[0] + a[4] * b[1] + a[ 8] * b[2] + a[12];
         r[1] = a[1] * b[0] + a[5] * b[1] + a[ 9] * b[2] + a[13];
         r[2] = a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14];
-        for (var i = 0; i < 3; i++)
+        for (let i = 0; i < 3; i++)
           c[i] = r[i];
       }
 
       /* Transpuesta de una matriz 4 x 4 */
       function transpuesta(r, m) {
-        var i = 0;
-        for (var j = 0; j < 4; j++)
-          for (var k = 0; k < 4; k++) {
+        let i = 0;
+        for (let j = 0; j < 4; j++)
+          for (let k = 0; k < 4; k++) {
             r[j + k * 4] = m[i];
             i++;
           }
@@ -453,7 +453,7 @@
          *                               u.x * v.y - u.y * v.x)                  
          */
         producto_vectorial(v2) {
-          var r = new Vector3();
+          let r = new Vector3();
           r.x = (this.y * v2.z) - (this.z * v2.y);
           r.y = (this.z * v2.x) - (this.x * v2.z);
           r.z = (this.x * v2.y) - (this.y * v2.x);
@@ -487,7 +487,7 @@
          *                     
          */
         normaliza() {
-          var l = this.longitud();
+          let l = this.longitud();
           if (l > 0 ) {
             this.x = this.x / l;
             this.y = this.y / l;
@@ -505,9 +505,9 @@
          *          u
          */
         normal(v1, v2, v3) {
-          var u = new Vector3(); // vector u
-          var v = new Vector3(); // vector v
-          var n = new Vector3(); // vector n
+          let u = new Vector3(); // vector u
+          let v = new Vector3(); // vector v
+          let n = new Vector3(); // vector n
 
           /* Calcula los vectores u y v */
           u = v2.menos(v1);
@@ -607,19 +607,19 @@
           this.esferaVAO = gl.createVertexArray();
           gl.bindVertexArray(this.esferaVAO);
 
-          var verticeBuffer = gl.createBuffer();
+          let verticeBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, verticeBuffer);
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
           gl.enableVertexAttribArray(0);
           gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
-          var normalBuffer = gl.createBuffer();
+          let normalBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normales), gl.STATIC_DRAW);
           gl.enableVertexAttribArray(1);
           gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
 
-          var indiceBuffer = gl.createBuffer();
+          let indiceBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
@@ -639,7 +639,7 @@
       /* Se renderizan todos los objetos                                         */
       /***************************************************************************/
       function dibuja() {
-        var brillo = document.getElementById("brillo").value;
+        let brillo = document.getElementById("brillo").value;
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -665,9 +665,9 @@
 
       function main() {
         canvas = document.getElementById("webglcanvas");
-        gl = canvas.getContext("webgl2");
         canvas.width = window.innerWidth;   // devuelve el ancho de la ventana 
         canvas.height = window.innerHeight; // devuelve el alto de la ventana           
+        gl = canvas.getContext("webgl2");
         if (!gl) {
             document.write("WebGL 2.0 no está disponible en tu navegador");
             return;
@@ -704,7 +704,7 @@
         gl.uniform3fv(uPosicionVista, posicionVista);
 
         /* Posición de la luz */
-        var pLuz = new Array(3);
+        let pLuz = new Array(3);
         multiplicaMV(pLuz, MatrizVista, posicionLuz);
         gl.uniform3fv(uPosicionLuz, pLuz);
 

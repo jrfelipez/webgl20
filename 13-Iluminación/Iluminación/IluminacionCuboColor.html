@@ -103,41 +103,41 @@
       "use strict";
 
       /* Variables globales */
-      var canvas;
-      var programaID;
-      var gl;
-      var cubo;
-      var arcBall;
+      let canvas;
+      let programaID;
+      let gl;
+      let cubo;
+      let arcBall;
 
       /* Variables Uniformes */
-      var uMatrizProyeccion;
-      var uMatrizVista;
-      var uMatrizModelo;
-      var uPosicionVista;
-      var uPosicionLuz;
-      var u_Ia;
-      var u_Id;
-      var u_Is;
-      var u_ka;
-      var u_kd;
-      var u_ks;
-      var u_brillo;
+      let uMatrizProyeccion;
+      let uMatrizVista;
+      let uMatrizModelo;
+      let uPosicionVista;
+      let uPosicionLuz;
+      let u_Ia;
+      let u_Id;
+      let u_Is;
+      let u_ka;
+      let u_kd;
+      let u_ks;
+      let u_brillo;
 
       /* Matrices */
-      var MatrizProyeccion = new Array(16);
-      var MatrizVista = new Array(16);
-      var MatrizModelo = new Array(16);
+      let MatrizProyeccion = new Array(16);
+      let MatrizVista = new Array(16);
+      let MatrizModelo = new Array(16);
 
       /* Para la interacción */
-      var MatrizRotacion = new Array(16);
-      var B = new Array(16);
-      var boton_izq_presionado = false;
+      let MatrizRotacion = new Array(16);
+      let B = new Array(16);
+      let boton_izq_presionado = false;
 
       /* Ubicación de la vista */
-      var posicionVista = [0, 0, 0];
+      let posicionVista = [0, 0, 0];
 
       /* Ubicación de la luz */
-      var posicionLuz = [3, 3, -2];
+      let posicionLuz = [3, 3, -2];
 
       /***************************************************************************/
       /* Se crean, compilan y enlazan los programas Shader                       */
@@ -145,7 +145,7 @@
       function compilaEnlazaLosShaders() {
 
         /* Se compila el shader de vertice */
-        var shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
+        let shaderDeVertice = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(shaderDeVertice, document.getElementById("vs").text.trim());
         gl.compileShader(shaderDeVertice);
         if (!gl.getShaderParameter(shaderDeVertice, gl.COMPILE_STATUS)) {
@@ -153,7 +153,7 @@
         }
 
         /* Se compila el shader de fragmento */
-        var shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
+        let shaderDeFragmento = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(shaderDeFragmento, document.getElementById("fs").text.trim());
         gl.compileShader(shaderDeFragmento);
         if (!gl.getShaderParameter(shaderDeFragmento, gl.COMPILE_STATUS)) {
@@ -192,7 +192,7 @@
 
       /* Traslación - glTranslatef */
       function traslacion(matriz, tx, ty, tz) {
-        var r = new Array(16);
+        let r = new Array(16);
         r[0] = 1; r[4] = 0; r[ 8] = 0; r[12] = tx;
         r[1] = 0; r[5] = 1; r[ 9] = 0; r[13] = ty;
         r[2] = 0; r[6] = 0; r[10] = 1; r[14] = tz;
@@ -202,7 +202,7 @@
 
       /* Escalación - glScalef */
       function escalacion(matriz, sx, sy, sz) { 
-        var r = new Array(16);
+        let r = new Array(16);
         r[0] = sx; r[4] =  0; r[ 8] =  0; r[12] =  0;
         r[1] =  0; r[5] = sy; r[ 9] =  0; r[13] =  0;
         r[2] =  0; r[6] =  0; r[10] = sz; r[14] =  0;
@@ -213,8 +213,8 @@
       /* Rotación sobre X - glRotatef */
       function rotacionX(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  1; r[4] =  0; r[ 8] =  0; r[12] = 0;
         r[1] =  0; r[5] =  c; r[ 9] = -s; r[13] = 0;
         r[2] =  0; r[6] =  s; r[10] =  c; r[14] = 0;
@@ -225,8 +225,8 @@
       /* Rotación sobre Y - glRotatef */
       function rotacionY(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  c; r[4] =  0; r[ 8] =  s; r[12] = 0;
         r[1] =  0; r[5] =  1; r[ 9] =  0; r[13] = 0;
         r[2] = -s; r[6] =  0; r[10] =  c; r[14] = 0;
@@ -237,8 +237,8 @@
       /* Rotación sobre Z - glRotatef */
       function rotacionZ(matriz, theta){
         let r = new Array(16);
-        var c = Math.cos(toRadians(theta));
-        var s = Math.sin(toRadians(theta));
+        let c = Math.cos(toRadians(theta));
+        let s = Math.sin(toRadians(theta));
         r[0] =  c; r[4] = -s; r[ 8] =  0; r[12] = 0;
         r[1] =  s; r[5] =  c; r[ 9] =  0; r[13] = 0;
         r[2] =  0; r[6] =  0; r[10] =  1; r[14] = 0;
@@ -264,8 +264,8 @@
 
       /* Proyección Perspectiva - gluPerspective */
       function perspective(r, fovy, aspecto, cerca, lejos) {
-        var ang = fovy * 0.5;
-        var f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
+        let ang = fovy * 0.5;
+        let f = (Math.abs(Math.sin(toRadians(ang))) < 1e-8 ? 0 : 1) / Math.tan(toRadians(ang));
         r[0] = f/aspecto; r[4] = 0; r[ 8] =                                  0; r[12] =                                       0;
         r[1] =         0; r[5] = f; r[ 9] =                                  0; r[13] =                                       0;
         r[2] =         0; r[6] = 0; r[10] = -(lejos + cerca) / (lejos - cerca); r[14] =  -2.0 * lejos * cerca / (lejos - cerca);
@@ -292,24 +292,24 @@
       function lookAt(r, vistaX, vistaY, vistaZ, centroX,
         centroY, centroZ, arribaX, arribaY, arribaZ) {
 
-        var vista = new Vector3(vistaX, vistaY, vistaZ);
-        var centro = new Vector3(centroX, centroY, centroZ);
-        var arriba = new Vector3(arribaX, arribaY, arribaZ);
+        let vista = new Vector3(vistaX, vistaY, vistaZ);
+        let centro = new Vector3(centroX, centroY, centroZ);
+        let arriba = new Vector3(arribaX, arribaY, arribaZ);
     
         /* n = vista - centro */
-        var n = vista.menos(centro);
+        let n = vista.menos(centro);
 
         /* u = u / || u || */
         n.normaliza();
   
         /* v = arriba */
-        var v = arriba;
+        let v = arriba;
 
         /* v = v / || v || */
         //v.normaliza(); // No es necesario!
 
         /* u = v x n */
-        var u = v.producto_vectorial(n);
+        let u = v.producto_vectorial(n);
   
         /* u = u / || u || */
         u.normaliza();
@@ -337,15 +337,15 @@
         r[0] = a[0] * b[0] + a[4] * b[1] + a[ 8] * b[2] + a[12];
         r[1] = a[1] * b[0] + a[5] * b[1] + a[ 9] * b[2] + a[13];
         r[2] = a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14];
-        for (var i = 0; i < 3; i++)
+        for (let i = 0; i < 3; i++)
           c[i] = r[i];
       }
 
       /* Transpuesta de una matriz 4 x 4 */
       function transpuesta(r, m) {
-        var i = 0;
-        for (var j = 0; j < 4; j++)
-          for (var k = 0; k < 4; k++) {
+        let i = 0;
+        for (let j = 0; j < 4; j++)
+          for (let k = 0; k < 4; k++) {
             r[j + k * 4] = m[i];
             i++;
           }
@@ -364,22 +364,22 @@
           | a[3] a[7] a[11] a[15] |
         */
 
-        var s0 = a[0] * a[5] - a[1] * a[4];
-        var s1 = a[0] * a[9] - a[1] * a[8];
-        var s2 = a[0] * a[13] - a[1] * a[12];
-        var s3 = a[4] * a[9] - a[5] * a[8];
-        var s4 = a[4] * a[13] - a[5] * a[12];
-        var s5 = a[8] * a[13] - a[9] * a[12];
+        let s0 = a[0] * a[5] - a[1] * a[4];
+        let s1 = a[0] * a[9] - a[1] * a[8];
+        let s2 = a[0] * a[13] - a[1] * a[12];
+        let s3 = a[4] * a[9] - a[5] * a[8];
+        let s4 = a[4] * a[13] - a[5] * a[12];
+        let s5 = a[8] * a[13] - a[9] * a[12];
 
-        var c5 = a[10] * a[15] - a[11] * a[14];
-        var c4 = a[6] * a[15] - a[7] * a[14];
-        var c3 = a[6] * a[11] - a[7] * a[10];
-        var c2 = a[2] * a[15] - a[3] * a[14];
-        var c1 = a[2] * a[11] - a[3] * a[10];
-        var c0 = a[2] * a[7] - a[3] * a[6];
+        let c5 = a[10] * a[15] - a[11] * a[14];
+        let c4 = a[6] * a[15] - a[7] * a[14];
+        let c3 = a[6] * a[11] - a[7] * a[10];
+        let c2 = a[2] * a[15] - a[3] * a[14];
+        let c1 = a[2] * a[11] - a[3] * a[10];
+        let c0 = a[2] * a[7] - a[3] * a[6];
 
         // Se deberia verificar por el determinante igual a 0
-        var invdet = 1.0 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
+        let invdet = 1.0 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
 
         b[0] = ( a[5] * c5 - a[9] * c4 + a[13] * c3) * invdet;
         b[4] = (-a[4] * c5 + a[8] * c4 - a[12] * c3) * invdet;
@@ -444,7 +444,7 @@
           *                               u.x * v.y - u.y * v.x)                  
           */
         producto_vectorial(v2) {
-          var r = new Vector3();
+          let r = new Vector3();
           r.x = (this.y * v2.z) - (this.z * v2.y);
           r.y = (this.z * v2.x) - (this.x * v2.z);
           r.z = (this.x * v2.y) - (this.y * v2.x);
@@ -478,7 +478,7 @@
           *                     
           */
         normaliza() {
-          var l = this.longitud();
+          let l = this.longitud();
           if (l > 0 ) {
             this.x = this.x / l;
             this.y = this.y / l;
@@ -496,9 +496,9 @@
           *          u
           */
         normal(v1, v2, v3) {
-          var u = new Vector3(); // vector u
-          var v = new Vector3(); // vector v
-          var n = new Vector3(); // vector n
+          let u = new Vector3(); // vector u
+          let v = new Vector3(); // vector v
+          let n = new Vector3(); // vector n
 
           /* Calcula los vectores u y v */
           u = v2.menos(v1);
@@ -522,7 +522,7 @@
       /* ArcBall: Obtiene los vectores U y V de la esfera (x^2 + y^2 + z^2 = 1). */
       /***************************************************************************/
 
-      var Punto2f = function(x, y) {
+      let Punto2f = function(x, y) {
         // Atributos publicos
         this.x = x;
         this.y = y;
@@ -741,7 +741,7 @@
             */
 
           /* Las coordenadas cartesianas (x, y, z) */
-          var vertices = [
+          let vertices = [
             // Frente
             -1, -1,  1, // 4   0
               1, -1,  1, // 5   1
@@ -775,7 +775,7 @@
           ];
 
           /* Las normales x c/cara (x,y,z) */
-          var normales = [
+          let normales = [
             // Frente
               0,  0,  1, // 4   0
               0,  0,  1, // 5   1
@@ -809,7 +809,7 @@
           ];
 
           /* Indices */
-          var indices = [ 
+          let indices = [ 
               0,  1,  2,  0,  2,  3, // Frente
               4,  5,  6,  4,  6,  7, // Atrás
               8,  9, 10,  8, 10, 11, // Izquierda 
@@ -821,19 +821,19 @@
           this.cuboVAO = gl.createVertexArray();
           gl.bindVertexArray(this.cuboVAO);
 
-          var verticeBuffer = gl.createBuffer();
+          let verticeBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, verticeBuffer);
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
           gl.enableVertexAttribArray(0);
           gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
-          var normalBuffer = gl.createBuffer();
+          let normalBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normales), gl.STATIC_DRAW);
           gl.enableVertexAttribArray(1);
           gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
 
-          var indiceBuffer = gl.createBuffer();
+          let indiceBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW); // DYNAMIC_DRAW
 
@@ -917,8 +917,8 @@
       /* Eventos del Ratón                                                       */
       /***************************************************************************/
       function mouseDown(event) {
-        var posx = new Number();
-        var posy = new Number();
+        let posx = new Number();
+        let posy = new Number();
 
         /* Obtiene la coordenada dentro de la área mayor */
         if (event.x != undefined && event.y != undefined) {
@@ -951,8 +951,8 @@
         if (!boton_izq_presionado)
           return false;
 
-        var posx = new Number();
-        var posy = new Number();
+        let posx = new Number();
+        let posy = new Number();
 
         /* Obtiene la coordenada dentro de la área mayor */
         if (event.x != undefined && event.y != undefined) {
@@ -1043,7 +1043,7 @@
         gl.uniform3fv(uPosicionVista, posicionVista);
 
         /* Posición de la luz */
-        var pLuz = new Array(3);
+        let pLuz = new Array(3);
         multiplicaMV(pLuz, MatrizVista, posicionLuz);
         gl.uniform3fv(uPosicionLuz, pLuz);
 
